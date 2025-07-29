@@ -506,9 +506,13 @@ async def update_admin_settings(settings_update: SettingsUpdate, admin: str = De
         if "@" not in settings_update.zelle_email or "." not in settings_update.zelle_email:
             raise HTTPException(status_code=400, detail="Invalid email format")
         
-        # Validate price
+        # Validate prices
         if settings_update.consultation_price <= 0:
-            raise HTTPException(status_code=400, detail="Price must be greater than 0")
+            raise HTTPException(status_code=400, detail="Consultation price must be greater than 0")
+        if settings_update.half_hour_extension < 0:
+            raise HTTPException(status_code=400, detail="Half hour extension price cannot be negative")
+        if settings_update.full_hour_extension < 0:
+            raise HTTPException(status_code=400, detail="Full hour extension price cannot be negative")
         
         # Update or create settings
         result = await db.settings.update_one(
@@ -516,6 +520,8 @@ async def update_admin_settings(settings_update: SettingsUpdate, admin: str = De
             {"$set": {
                 "zelle_email": settings_update.zelle_email,
                 "consultation_price": settings_update.consultation_price,
+                "half_hour_extension": settings_update.half_hour_extension,
+                "full_hour_extension": settings_update.full_hour_extension,
                 "updated_at": datetime.now(VET).isoformat(),
                 "updated_by": admin
             }},
@@ -525,7 +531,9 @@ async def update_admin_settings(settings_update: SettingsUpdate, admin: str = De
         return {
             "message": "Settings updated successfully",
             "zelle_email": settings_update.zelle_email,
-            "consultation_price": settings_update.consultation_price
+            "consultation_price": settings_update.consultation_price,
+            "half_hour_extension": settings_update.half_hour_extension,
+            "full_hour_extension": settings_update.full_hour_extension
         }
     except HTTPException:
         raise
