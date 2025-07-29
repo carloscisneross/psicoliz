@@ -292,38 +292,77 @@ const BookingFlow = () => {
             {step === 3 && (
               <div className="fade-in-up">
                 <h2 className="text-2xl font-semibold text-golden-brown mb-6 text-center">
-                  Método de pago
+                  Método de pago y duración
                 </h2>
                 
-                <div className="space-y-4 mb-8">
-                  <div
-                    className={`payment-card p-6 rounded-xl ${
-                      formData.payment_method === 'paypal' ? 'selected' : ''
-                    }`}
-                    onClick={() => setFormData({...formData, payment_method: 'paypal'})}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="text-3xl">💳</div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-golden-brown">PayPal</h3>
-                        <p className="text-gray-600">Pago inmediato y seguro</p>
-                        <p className="text-lg font-semibold text-golden-brown">$50.00 USD</p>
+                {/* Session Duration Selection */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-golden-brown mb-4">
+                    Duración de la sesión:
+                  </h3>
+                  <div className="space-y-3">
+                    {Object.entries(pricingConfig).map(([key, config]) => {
+                      if (key === 'currency') return null;
+                      return (
+                        <div
+                          key={key}
+                          className={`payment-card p-4 rounded-xl cursor-pointer ${
+                            selectedDuration === key ? 'selected' : ''
+                          }`}
+                          onClick={() => setSelectedDuration(key)}
+                        >
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h4 className="text-lg font-semibold text-golden-brown">
+                                {config.duration}
+                              </h4>
+                              <p className="text-gray-600 text-sm">{config.description}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xl font-bold text-golden-brown">
+                                ${config.price?.toFixed(2)} USD
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Payment Method Selection */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-golden-brown mb-4">
+                    Método de pago:
+                  </h3>
+                  <div className="space-y-4">
+                    <div
+                      className={`payment-card p-6 rounded-xl ${
+                        formData.payment_method === 'paypal' ? 'selected' : ''
+                      }`}
+                      onClick={() => setFormData({...formData, payment_method: 'paypal'})}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="text-3xl">💳</div>
+                        <div>
+                          <h3 className="text-xl font-semibold text-golden-brown">PayPal</h3>
+                          <p className="text-gray-600">Pago inmediato y seguro</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div
-                    className={`payment-card p-6 rounded-xl ${
-                      formData.payment_method === 'zelle' ? 'selected' : ''
-                    }`}
-                    onClick={() => setFormData({...formData, payment_method: 'zelle'})}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="text-3xl">🏦</div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-golden-brown">Zelle</h3>
-                        <p className="text-gray-600">Transferencia bancaria</p>
-                        <p className="text-lg font-semibold text-golden-brown">$50.00 USD</p>
+                    
+                    <div
+                      className={`payment-card p-6 rounded-xl ${
+                        formData.payment_method === 'zelle' ? 'selected' : ''
+                      }`}
+                      onClick={() => setFormData({...formData, payment_method: 'zelle'})}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="text-3xl">🏦</div>
+                        <div>
+                          <h3 className="text-xl font-semibold text-golden-brown">Zelle</h3>
+                          <p className="text-gray-600">Transferencia bancaria</p>
+                        </div>
                       </div>
                     </div>
                   </div>
