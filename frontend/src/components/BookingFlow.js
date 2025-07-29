@@ -18,7 +18,7 @@ const BookingFlow = () => {
     payment_method: ''
   });
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 
   // Load available times when date changes
   useEffect(() => {
