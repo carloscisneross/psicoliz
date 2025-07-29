@@ -237,7 +237,7 @@ async def create_zelle_booking(booking: AppointmentBooking):
         
         return {
             "booking_id": appointment_id,
-            "zelle_email": "psicolizparra@gmail.com",
+            "zelle_email": os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com'),
             "amount": "$50.00",
             "message": "Please send payment proof after completing Zelle transfer"
         }
