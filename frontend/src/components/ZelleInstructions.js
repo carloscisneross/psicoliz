@@ -128,13 +128,13 @@ const ZelleInstructions = () => {
                 <div className="flex items-center space-x-3">
                   <span className="font-semibold text-gray-700">Email:</span>
                   <span className="bg-white px-3 py-1 rounded-lg border font-mono">
-                    psicolizparra@gmail.com
+                    {zelleConfig.zelle_email}
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <span className="font-semibold text-gray-700">Monto:</span>
                   <span className="bg-white px-3 py-1 rounded-lg border font-bold text-golden-brown">
-                    $50.00 USD
+                    {zelleConfig.amount} USD
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">
