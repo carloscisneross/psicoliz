@@ -299,7 +299,17 @@ async def create_zelle_booking(booking: AppointmentBooking):
         # Get current settings
         settings = await db.settings.find_one({"type": "zelle_config"})
         zelle_email = settings.get("zelle_email", os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com')) if settings else os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com')
-        consultation_price = settings.get("consultation_price", 50.00) if settings else 50.00
+        base_price = settings.get("consultation_price", 50.00) if settings else 50.00
+        half_hour_ext = settings.get("half_hour_extension", 25.00) if settings else 25.00
+        full_hour_ext = settings.get("full_hour_extension", 45.00) if settings else 45.00
+        
+        # Calculate final price based on session duration
+        if booking.session_duration == "plus_30min":
+            final_price = base_price + half_hour_ext
+        elif booking.session_duration == "plus_60min":
+            final_price = base_price + full_hour_ext
+        else:
+            final_price = base_price
         
         appointment_id = str(uuid.uuid4())
         appointment_data = {
@@ -310,6 +320,8 @@ async def create_zelle_booking(booking: AppointmentBooking):
             "appointment_date": booking.appointment_date,
             "appointment_time": booking.appointment_time,
             "payment_method": "zelle",
+            "session_duration": booking.session_duration,
+            "session_price": final_price,
             "status": "awaiting_payment_proof",
             "created_at": datetime.now(VET).isoformat()
         }
@@ -319,7 +331,7 @@ async def create_zelle_booking(booking: AppointmentBooking):
         return {
             "booking_id": appointment_id,
             "zelle_email": zelle_email,
-            "amount": f"${consultation_price:.2f}",
+            "amount": f"${final_price:.2f}",
             "message": "Please send payment proof after completing Zelle transfer"
         }
         
