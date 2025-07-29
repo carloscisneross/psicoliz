@@ -81,6 +81,7 @@ class AppointmentBooking(BaseModel):
     appointment_date: str
     appointment_time: str
     payment_method: str  # "paypal" or "zelle"
+    session_duration: str = "standard"  # "standard", "plus_30min", "plus_60min"
 
 class ZelleUpload(BaseModel):
     booking_id: str
