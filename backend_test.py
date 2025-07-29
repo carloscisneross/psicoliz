@@ -23,11 +23,11 @@ print(f"Testing backend at: {API_BASE}")
 
 # Test data as specified in the review request
 TEST_DATA = {
-    "full_name": "María González",
-    "email": "maria@example.com",
-    "whatsapp": "+58 412-123-4567",
-    "appointment_date": "2024-07-30",  # Tomorrow's date as specified
-    "appointment_time": "10:00",
+    "full_name": "Test User",
+    "email": "test@example.com",
+    "whatsapp": "+58 412-999-8888",
+    "appointment_date": "2024-07-31",
+    "appointment_time": "14:00",
     "payment_method": "paypal"
 }
 
