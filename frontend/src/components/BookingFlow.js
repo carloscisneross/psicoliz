@@ -29,6 +29,19 @@ const BookingFlow = () => {
     }
   }, [selectedDate]);
 
+  // Load pricing configuration
+  useEffect(() => {
+    const loadPricing = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/api/pricing-config`);
+        setPricingConfig(response.data);
+      } catch (error) {
+        console.error('Error loading pricing:', error);
+      }
+    };
+    loadPricing();
+  }, [backendUrl]);
+
   const loadAvailableSlots = async () => {
     try {
       setLoading(true);
