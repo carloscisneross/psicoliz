@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import motor.motor_asyncio
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
@@ -16,6 +17,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 import pytz
+import secrets
 from dotenv import load_dotenv
 
 load_dotenv()
