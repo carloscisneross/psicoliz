@@ -12,12 +12,17 @@ const AdminPanel = () => {
     half_hour_extension: 25.00,
     full_hour_extension: 45.00
   });
+  const [schedule, setSchedule] = useState({
+    weekly_schedule: {},
+    custom_schedules: []
+  });
   const [loading, setLoading] = useState(true);
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [authenticated, setAuthenticated] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('appointments');
   const [settingsLoading, setSettingsLoading] = useState(false);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 
