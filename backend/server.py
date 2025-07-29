@@ -242,6 +242,11 @@ async def confirm_paypal_payment(payment_id: str, payer_id: str, booking_id: str
 async def create_zelle_booking(booking: AppointmentBooking):
     """Create Zelle booking (pending payment proof)"""
     try:
+        # Get current settings
+        settings = await db.settings.find_one({"type": "zelle_config"})
+        zelle_email = settings.get("zelle_email", os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com')) if settings else os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com')
+        consultation_price = settings.get("consultation_price", 50.00) if settings else 50.00
+        
         appointment_id = str(uuid.uuid4())
         appointment_data = {
             "id": appointment_id,
@@ -259,8 +264,8 @@ async def create_zelle_booking(booking: AppointmentBooking):
         
         return {
             "booking_id": appointment_id,
-            "zelle_email": os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com'),
-            "amount": "$50.00",
+            "zelle_email": zelle_email,
+            "amount": f"${consultation_price:.2f}",
             "message": "Please send payment proof after completing Zelle transfer"
         }
         
