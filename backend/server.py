@@ -86,6 +86,10 @@ class ZelleUpload(BaseModel):
     booking_id: str
     receipt_file: str  # base64 encoded
 
+class SettingsUpdate(BaseModel):
+    zelle_email: str
+    consultation_price: float = 50.00
+
 # Available time slots
 AVAILABLE_TIMES = [
     "09:00", "10:00", "11:00", "12:00", 
