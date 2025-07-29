@@ -553,6 +553,213 @@ const AdminPanel = () => {
           </div>
         )}
 
+        {activeTab === 'schedule' && (
+          /* Schedule Management Panel */
+          <div className="space-y-8">
+            {/* Weekly Schedule */}
+            <div className="elegant-card rounded-3xl p-6">
+              <h2 className="text-xl font-semibold text-golden-brown mb-6">
+                🕐 Horario Semanal por Defecto
+              </h2>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center space-x-2">
+                  <span className="text-blue-600">ℹ️</span>
+                  <p className="text-blue-800 font-medium">Configuración de Horarios</p>
+                </div>
+                <p className="text-blue-700 text-sm mt-2">
+                  Define tus horarios disponibles para cada día de la semana. Puedes crear excepciones específicas más abajo.
+                </p>
+              </div>
+
+              {Object.entries(schedule.weekly_schedule || {}).map(([day, times]) => (
+                <div key={day} className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-medium text-golden-brown capitalize">
+                      {day === 'monday' && '🌟 Lunes'}
+                      {day === 'tuesday' && '🌟 Martes'}
+                      {day === 'wednesday' && '🌟 Miércoles'}
+                      {day === 'thursday' && '🌟 Jueves'}
+                      {day === 'friday' && '🌟 Viernes'}
+                      {day === 'saturday' && '🌅 Sábado'}
+                      {day === 'sunday' && '🌴 Domingo'}
+                    </h3>
+                    <button
+                      onClick={() => {
+                        const newTimes = [...times, '09:00'];
+                        setSchedule({
+                          ...schedule,
+                          weekly_schedule: {
+                            ...schedule.weekly_schedule,
+                            [day]: newTimes
+                          }
+                        });
+                      }}
+                      className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
+                    >
+                      + Agregar Hora
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-6 gap-2">
+                    {times.map((time, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <input
+                          type="time"
+                          value={time}
+                          onChange={(e) => {
+                            const newTimes = [...times];
+                            newTimes[index] = e.target.value;
+                            setSchedule({
+                              ...schedule,
+                              weekly_schedule: {
+                                ...schedule.weekly_schedule,
+                                [day]: newTimes
+                              }
+                            });
+                          }}
+                          className="form-input px-2 py-1 text-sm rounded"
+                        />
+                        <button
+                          onClick={() => {
+                            const newTimes = times.filter((_, i) => i !== index);
+                            setSchedule({
+                              ...schedule,
+                              weekly_schedule: {
+                                ...schedule.weekly_schedule,
+                                [day]: newTimes
+                              }
+                            });
+                          }}
+                          className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              <button
+                onClick={updateWeeklySchedule}
+                disabled={scheduleLoading}
+                className="btn-primary px-6 py-3 rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {scheduleLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="loading-spinner"></div>
+                    <span>Guardando...</span>
+                  </div>
+                ) : (
+                  '💾 Guardar Horario Semanal'
+                )}
+              </button>
+            </div>
+
+            {/* Custom Schedules */}
+            <div className="elegant-card rounded-3xl p-6">
+              <h2 className="text-xl font-semibold text-golden-brown mb-6">
+                📅 Horarios Personalizados y Días Bloqueados
+              </h2>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center space-x-2">
+                  <span className="text-yellow-600">⚠️</span>
+                  <p className="text-yellow-800 font-medium">Excepciones al Horario</p>
+                </div>
+                <p className="text-yellow-700 text-sm mt-2">
+                  Aquí puedes crear excepciones para días específicos: cambiar horarios, agregar días extra, o bloquear días por vacaciones.
+                </p>
+              </div>
+
+              {/* Add Custom Schedule */}
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h3 className="text-lg font-medium text-golden-brown mb-4">
+                  ➕ Crear Excepción para Fecha Específica
+                </h3>
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="date"
+                    id="customDate"
+                    min={new Date().toISOString().split('T')[0]}
+                    className="form-input px-3 py-2 rounded"
+                  />
+                  <button
+                    onClick={() => {
+                      const date = document.getElementById('customDate').value;
+                      if (date) {
+                        updateCustomSchedule(date, ['09:00', '10:00', '14:00', '15:00']);
+                      }
+                    }}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  >
+                    📝 Crear Horario Personalizado
+                  </button>
+                  <button
+                    onClick={() => {
+                      const date = document.getElementById('customDate').value;
+                      if (date) {
+                        blockDate(date);
+                      }
+                    }}
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  >
+                    🚫 Bloquear Día
+                  </button>
+                </div>
+              </div>
+
+              {/* Existing Custom Schedules */}
+              <div className="space-y-4">
+                {schedule.custom_schedules?.map((customSchedule) => (
+                  <div key={customSchedule.date} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-lg font-medium text-golden-brown">
+                        📅 {new Date(customSchedule.date + 'T00:00:00').toLocaleDateString('es-ES', { 
+                          weekday: 'long', 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}
+                      </h4>
+                      <div className="flex space-x-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          customSchedule.is_available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {customSchedule.is_available ? 'Disponible' : 'Bloqueado'}
+                        </span>
+                        <button
+                          onClick={() => deleteCustomSchedule(customSchedule.date)}
+                          className="bg-gray-500 text-white px-2 py-1 rounded text-xs hover:bg-gray-600"
+                        >
+                          🗑️ Eliminar
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {customSchedule.is_available && (
+                      <div className="grid grid-cols-6 gap-2">
+                        {customSchedule.available_times?.map((time, index) => (
+                          <div key={index} className="flex items-center space-x-1">
+                            <span className="bg-golden-brown text-white px-2 py-1 rounded text-sm">
+                              {time}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {!customSchedule.is_available && (
+                      <p className="text-red-600 italic">Día completamente bloqueado</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'settings' && (
           /* Settings Panel */
           <div className="elegant-card rounded-3xl p-6">
