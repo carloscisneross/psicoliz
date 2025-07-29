@@ -8,8 +8,23 @@ const ZelleInstructions = () => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [zelleConfig, setZelleConfig] = useState({ zelle_email: 'psicolizparra@gmail.com', amount: '$50.00' });
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+
+  // Load Zelle configuration
+  useEffect(() => {
+    const loadZelleConfig = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/api/zelle-config`);
+        setZelleConfig(response.data);
+      } catch (error) {
+        console.error('Error loading Zelle config:', error);
+        // Use default values if API fails
+      }
+    };
+    loadZelleConfig();
+  }, [backendUrl]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
