@@ -162,6 +162,80 @@ const AdminPanel = () => {
     }
   };
 
+  const updateWeeklySchedule = async () => {
+    try {
+      setScheduleLoading(true);
+      const auth = localStorage.getItem('adminAuth');
+      
+      await axios.put(`${backendUrl}/api/admin/schedule/weekly`, schedule.weekly_schedule, {
+        headers: { 
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      alert('Horario semanal actualizado exitosamente');
+    } catch (error) {
+      console.error('Error updating weekly schedule:', error);
+      alert('Error al actualizar el horario semanal');
+    } finally {
+      setScheduleLoading(false);
+    }
+  };
+
+  const updateCustomSchedule = async (date, times, isAvailable = true) => {
+    try {
+      const auth = localStorage.getItem('adminAuth');
+      
+      await axios.put(`${backendUrl}/api/admin/schedule/custom`, {
+        date: date,
+        available_times: times,
+        is_available: isAvailable
+      }, {
+        headers: { 
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // Reload schedule data
+      const scheduleRes = await axios.get(`${backendUrl}/api/admin/schedule`, {
+        headers: { 'Authorization': `Basic ${auth}` }
+      });
+      setSchedule(scheduleRes.data);
+      
+      alert(`Horario personalizado actualizado para ${date}`);
+    } catch (error) {
+      console.error('Error updating custom schedule:', error);
+      alert('Error al actualizar el horario personalizado');
+    }
+  };
+
+  const blockDate = async (date) => {
+    await updateCustomSchedule(date, [], false);
+  };
+
+  const deleteCustomSchedule = async (date) => {
+    try {
+      const auth = localStorage.getItem('adminAuth');
+      
+      await axios.delete(`${backendUrl}/api/admin/schedule/custom/${date}`, {
+        headers: { 'Authorization': `Basic ${auth}` }
+      });
+      
+      // Reload schedule data
+      const scheduleRes = await axios.get(`${backendUrl}/api/admin/schedule`, {
+        headers: { 'Authorization': `Basic ${auth}` }
+      });
+      setSchedule(scheduleRes.data);
+      
+      alert(`Horario personalizado eliminado para ${date}. Reverted to default.`);
+    } catch (error) {
+      console.error('Error deleting custom schedule:', error);
+      alert('Error al eliminar el horario personalizado');
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('adminAuth');
     setAuthenticated(false);
