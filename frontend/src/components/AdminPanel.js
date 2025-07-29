@@ -56,7 +56,7 @@ const AdminPanel = () => {
         return;
       }
 
-      const [appointmentsRes, statsRes, settingsRes] = await Promise.all([
+      const [appointmentsRes, statsRes, settingsRes, scheduleRes] = await Promise.all([
         axios.get(`${backendUrl}/api/admin/appointments`, {
           headers: { 'Authorization': `Basic ${auth}` }
         }),
@@ -65,12 +65,16 @@ const AdminPanel = () => {
         }),
         axios.get(`${backendUrl}/api/admin/settings`, {
           headers: { 'Authorization': `Basic ${auth}` }
+        }),
+        axios.get(`${backendUrl}/api/admin/schedule`, {
+          headers: { 'Authorization': `Basic ${auth}` }
         })
       ]);
 
       setAppointments(appointmentsRes.data);
       setStats(statsRes.data);
       setSettings(settingsRes.data);
+      setSchedule(scheduleRes.data);
     } catch (error) {
       console.error('Error loading data:', error);
       if (error.response?.status === 401) {
