@@ -6,10 +6,13 @@ const AdminPanel = () => {
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [stats, setStats] = useState({});
+  const [settings, setSettings] = useState({ zelle_email: '', consultation_price: 50.00 });
   const [loading, setLoading] = useState(true);
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [authenticated, setAuthenticated] = useState(false);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('appointments');
+  const [settingsLoading, setSettingsLoading] = useState(false);
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 
