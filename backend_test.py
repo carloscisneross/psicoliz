@@ -275,6 +275,12 @@ def run_all_tests():
     # Test 6: Appointments List
     results['appointments_list'] = test_appointments_list()
     
+    # Test 7: Admin Stats
+    results['admin_stats'] = test_admin_stats()
+    
+    # Test 8: Admin Appointments
+    results['admin_appointments'] = test_admin_appointments()
+    
     # Summary
     print("\n" + "=" * 60)
     print("🏁 TEST SUMMARY")
