@@ -101,9 +101,17 @@ const BookingFlow = () => {
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
+            {/* Profile Image */}
+            <div className="mb-6">
+              <img
+                src="https://customer-assets.emergentagent.com/job_parra-psico/artifacts/ixqpyybc_IMG_3205.PNG"
+                alt="Liz Parra - Psicóloga"
+                className="w-32 h-32 rounded-full mx-auto profile-image object-cover"
+              />
+            </div>
             <button
               onClick={() => navigate('/')}
-              className="text-golden-brown hover:text-warm-brown mb-4 flex items-center space-x-2"
+              className="text-golden-brown hover:text-warm-brown mb-4 flex items-center space-x-2 mx-auto"
             >
               <span>←</span>
               <span>Volver al inicio</span>
