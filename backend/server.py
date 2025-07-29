@@ -477,17 +477,23 @@ async def get_admin_settings(admin: str = Depends(get_admin_user)):
                 "type": "zelle_config",
                 "zelle_email": os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com'),
                 "consultation_price": 50.00,
+                "half_hour_extension": 25.00,
+                "full_hour_extension": 45.00,
                 "created_at": datetime.now(VET).isoformat()
             }
             await db.settings.insert_one(default_settings)
             return {
                 "zelle_email": default_settings["zelle_email"],
-                "consultation_price": default_settings["consultation_price"]
+                "consultation_price": default_settings["consultation_price"],
+                "half_hour_extension": default_settings["half_hour_extension"],
+                "full_hour_extension": default_settings["full_hour_extension"]
             }
         
         return {
             "zelle_email": settings.get("zelle_email", os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com')),
-            "consultation_price": settings.get("consultation_price", 50.00)
+            "consultation_price": settings.get("consultation_price", 50.00),
+            "half_hour_extension": settings.get("half_hour_extension", 25.00),
+            "full_hour_extension": settings.get("full_hour_extension", 45.00)
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
