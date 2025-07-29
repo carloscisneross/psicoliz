@@ -198,6 +198,52 @@ def test_appointments_list():
         print(f"❌ Appointments list error: {str(e)}")
         return False
 
+def test_admin_stats():
+    """Test 7: Admin Stats endpoint with authentication"""
+    print("\n=== Testing Admin Stats Endpoint ===")
+    try:
+        # Use basic auth with admin credentials
+        auth = ('liz', 'psico2024')
+        response = requests.get(f"{API_BASE}/admin/stats", auth=auth)
+        print(f"Status Code: {response.status_code}")
+        print(f"Response: {response.json()}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ['total_appointments', 'confirmed_appointments', 'pending_appointments', 'paypal_appointments', 'zelle_appointments']
+            if all(field in data for field in required_fields):
+                print("✅ Admin stats retrieved successfully")
+                return True
+            else:
+                print("❌ Invalid admin stats response format")
+                return False
+        else:
+            print("❌ Admin stats request failed")
+            return False
+    except Exception as e:
+        print(f"❌ Admin stats error: {str(e)}")
+        return False
+
+def test_admin_appointments():
+    """Test 8: Admin Appointments endpoint with authentication"""
+    print("\n=== Testing Admin Appointments Endpoint ===")
+    try:
+        # Use basic auth with admin credentials
+        auth = ('liz', 'psico2024')
+        response = requests.get(f"{API_BASE}/admin/appointments", auth=auth)
+        print(f"Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            appointments = response.json()
+            print(f"✅ Admin appointments retrieved: {len(appointments)} appointments")
+            return True
+        else:
+            print("❌ Admin appointments request failed")
+            return False
+    except Exception as e:
+        print(f"❌ Admin appointments error: {str(e)}")
+        return False
+
 def run_all_tests():
     """Run all backend tests"""
     print("🧪 Starting Backend API Tests for Liz Parra's Psychology Website")
