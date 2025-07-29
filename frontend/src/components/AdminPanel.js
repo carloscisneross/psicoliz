@@ -471,10 +471,11 @@ const AdminPanel = () => {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <div className="flex items-center space-x-2">
                   <span className="text-blue-600">ℹ️</span>
-                  <p className="text-blue-800 font-medium">Configuración de Zelle</p>
+                  <p className="text-blue-800 font-medium">Configuración de Precios</p>
                 </div>
                 <p className="text-blue-700 text-sm mt-2">
-                  Aquí puedes cambiar el email donde los clientes enviarán los pagos por Zelle y el precio de las consultas.
+                  Configura el email para Zelle, precio base de consulta y tarifas para sesiones extendidas. 
+                  Los precios se aplican tanto para PayPal como para Zelle.
                 </p>
               </div>
 
@@ -495,29 +496,81 @@ const AdminPanel = () => {
                   </p>
                 </div>
                 
-                <div>
-                  <label className="block text-golden-brown font-medium mb-2">
-                    💰 Precio de consulta (USD)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={settings.consultation_price}
-                    onChange={(e) => setSettings({...settings, consultation_price: parseFloat(e.target.value) || 0})}
-                    className="form-input w-full p-4 rounded-lg"
-                    placeholder="50.00"
-                  />
-                  <p className="text-sm text-gray-600 mt-1">
-                    Precio que se mostrará a los clientes
-                  </p>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-golden-brown font-medium mb-2">
+                      💰 Sesión estándar (1 hora)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={settings.consultation_price}
+                        onChange={(e) => setSettings({...settings, consultation_price: parseFloat(e.target.value) || 0})}
+                        className="form-input w-full p-4 pl-8 rounded-lg"
+                        placeholder="50.00"
+                      />
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Precio base para sesión de 60 minutos
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-golden-brown font-medium mb-2">
+                      ⏰ Extensión +30 min
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={settings.half_hour_extension}
+                        onChange={(e) => setSettings({...settings, half_hour_extension: parseFloat(e.target.value) || 0})}
+                        className="form-input w-full p-4 pl-8 rounded-lg"
+                        placeholder="25.00"
+                      />
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Costo adicional por 30 minutos extra
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-golden-brown font-medium mb-2">
+                      ⏰⏰ Extensión +60 min
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={settings.full_hour_extension}
+                        onChange={(e) => setSettings({...settings, full_hour_extension: parseFloat(e.target.value) || 0})}
+                        className="form-input w-full p-4 pl-8 rounded-lg"
+                        placeholder="45.00"
+                      />
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Costo adicional por 60 minutos extra
+                    </p>
+                  </div>
                 </div>
 
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="text-green-800 font-medium mb-2">Vista previa:</p>
-                  <p className="text-green-700">
-                    Los clientes verán: "Envía <strong>${settings.consultation_price?.toFixed(2) || '50.00'} USD</strong> a <strong>{settings.zelle_email || 'tu-email@gmail.com'}</strong>"
-                  </p>
+                  <p className="text-green-800 font-medium mb-2">Vista previa de precios:</p>
+                  <div className="space-y-2 text-green-700">
+                    <p>• <strong>Sesión estándar (1 hora):</strong> ${settings.consultation_price?.toFixed(2) || '50.00'} USD</p>
+                    <p>• <strong>Sesión extendida (1.5 horas):</strong> ${((settings.consultation_price || 50) + (settings.half_hour_extension || 25)).toFixed(2)} USD</p>
+                    <p>• <strong>Sesión larga (2 horas):</strong> ${((settings.consultation_price || 50) + (settings.full_hour_extension || 45)).toFixed(2)} USD</p>
+                    <p className="text-sm mt-2 text-green-600">
+                      Los precios se aplican para PayPal y Zelle. Email Zelle: <strong>{settings.zelle_email || 'tu-email@gmail.com'}</strong>
+                    </p>
+                  </div>
                 </div>
 
                 <button
