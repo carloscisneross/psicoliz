@@ -24,6 +24,24 @@ load_dotenv()
 
 app = FastAPI()
 
+# Basic HTTP authentication
+security = HTTPBasic()
+
+# Admin credentials (in production, use proper authentication)
+ADMIN_USERNAME = "liz"
+ADMIN_PASSWORD = "psico2024"
+
+def get_admin_user(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, ADMIN_USERNAME)
+    correct_password = secrets.compare_digest(credentials.password, ADMIN_PASSWORD)
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
+
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
