@@ -93,13 +93,15 @@ const BookingFlow = () => {
         session_duration: selectedDuration
       };
 
+      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
+      
       if (formData.payment_method === 'paypal') {
         // Create PayPal order
-        const response = await axios.post(`${backendUrl}/api/create-paypal-order`, bookingData);
+        const response = await axios.post(`${apiUrl}/create-paypal-order`, bookingData);
         window.location.href = response.data.approval_url;
       } else if (formData.payment_method === 'zelle') {
         // Create Zelle booking
-        const response = await axios.post(`${backendUrl}/api/create-zelle-booking`, bookingData);
+        const response = await axios.post(`${apiUrl}/create-zelle-booking`, bookingData);
         navigate(`/zelle-instructions/${response.data.booking_id}`);
       }
     } catch (error) {
