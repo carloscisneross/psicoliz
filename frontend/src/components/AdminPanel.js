@@ -6,7 +6,12 @@ const AdminPanel = () => {
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [stats, setStats] = useState({});
-  const [settings, setSettings] = useState({ zelle_email: '', consultation_price: 50.00 });
+  const [settings, setSettings] = useState({ 
+    zelle_email: '', 
+    consultation_price: 50.00,
+    half_hour_extension: 25.00,
+    full_hour_extension: 45.00
+  });
   const [loading, setLoading] = useState(true);
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [authenticated, setAuthenticated] = useState(false);
