@@ -327,128 +327,212 @@ const AdminPanel = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-5 gap-4 mb-8">
-          <div className="elegant-card rounded-2xl p-4 text-center">
-            <div className="text-2xl font-bold text-golden-brown">{stats.total_appointments || 0}</div>
-            <div className="text-sm text-gray-600">Total Citas</div>
+        {/* Stats Cards - Only show for appointments tab */}
+        {activeTab === 'appointments' && (
+          <div className="grid md:grid-cols-5 gap-4 mb-8">
+            <div className="elegant-card rounded-2xl p-4 text-center">
+              <div className="text-2xl font-bold text-golden-brown">{stats.total_appointments || 0}</div>
+              <div className="text-sm text-gray-600">Total Citas</div>
+            </div>
+            <div className="elegant-card rounded-2xl p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">{stats.confirmed_appointments || 0}</div>
+              <div className="text-sm text-gray-600">Confirmadas</div>
+            </div>
+            <div className="elegant-card rounded-2xl p-4 text-center">
+              <div className="text-2xl font-bold text-yellow-600">{stats.pending_appointments || 0}</div>
+              <div className="text-sm text-gray-600">Pendientes</div>
+            </div>
+            <div className="elegant-card rounded-2xl p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{stats.paypal_appointments || 0}</div>
+              <div className="text-sm text-gray-600">PayPal</div>
+            </div>
+            <div className="elegant-card rounded-2xl p-4 text-center">
+              <div className="text-2xl font-bold text-purple-600">{stats.zelle_appointments || 0}</div>
+              <div className="text-sm text-gray-600">Zelle</div>
+            </div>
           </div>
-          <div className="elegant-card rounded-2xl p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">{stats.confirmed_appointments || 0}</div>
-            <div className="text-sm text-gray-600">Confirmadas</div>
-          </div>
-          <div className="elegant-card rounded-2xl p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-600">{stats.pending_appointments || 0}</div>
-            <div className="text-sm text-gray-600">Pendientes</div>
-          </div>
-          <div className="elegant-card rounded-2xl p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">{stats.paypal_appointments || 0}</div>
-            <div className="text-sm text-gray-600">PayPal</div>
-          </div>
-          <div className="elegant-card rounded-2xl p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">{stats.zelle_appointments || 0}</div>
-            <div className="text-sm text-gray-600">Zelle</div>
-          </div>
-        </div>
+        )}
 
-        {/* Appointments Table */}
-        <div className="elegant-card rounded-3xl p-6">
-          <h2 className="text-xl font-semibold text-golden-brown mb-6">
-            Lista de Citas ({appointments.length})
-          </h2>
-          
-          {appointments.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No hay citas registradas
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-golden-brown border-opacity-20">
-                    <th className="text-left py-3 px-2 font-semibold text-golden-brown">Fecha</th>
-                    <th className="text-left py-3 px-2 font-semibold text-golden-brown">Hora</th>
-                    <th className="text-left py-3 px-2 font-semibold text-golden-brown">Cliente</th>
-                    <th className="text-left py-3 px-2 font-semibold text-golden-brown">WhatsApp</th>
-                    <th className="text-left py-3 px-2 font-semibold text-golden-brown">Pago</th>
-                    <th className="text-left py-3 px-2 font-semibold text-golden-brown">Estado</th>
-                    <th className="text-left py-3 px-2 font-semibold text-golden-brown">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {appointments.map((appointment) => (
-                    <tr key={appointment.id} className="border-b border-gray-200">
-                      <td className="py-3 px-2">{appointment.appointment_date}</td>
-                      <td className="py-3 px-2">{appointment.appointment_time}</td>
-                      <td className="py-3 px-2">
-                        <div>
-                          <div className="font-medium">{appointment.full_name}</div>
-                          <div className="text-sm text-gray-500">{appointment.email}</div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-2">
-                        <a 
-                          href={`https://wa.me/${appointment.whatsapp.replace(/[^0-9]/g, '')}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-green-600 hover:text-green-800"
-                        >
-                          {appointment.whatsapp}
-                        </a>
-                      </td>
-                      <td className="py-3 px-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          appointment.payment_method === 'paypal' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
-                        }`}>
-                          {appointment.payment_method === 'paypal' ? 'PayPal' : 'Zelle'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(appointment.status)}`}>
-                          {getStatusText(appointment.status)}
-                        </span>
-                      </td>
-                      <td className="py-3 px-2">
-                        <div className="flex space-x-2">
-                          {appointment.payment_method === 'zelle' && appointment.status !== 'confirmed' && (
-                            <button
-                              onClick={() => confirmZellePayment(appointment.id)}
-                              className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
-                              title="Confirmar pago Zelle"
-                            >
-                              ✓
-                            </button>
-                          )}
-                          {appointment.zelle_receipt && (
-                            <button
-                              onClick={() => {
-                                const link = document.createElement('a');
-                                link.href = `data:image/jpeg;base64,${appointment.zelle_receipt}`;
-                                link.download = `comprobante_${appointment.id}.jpg`;
-                                link.click();
-                              }}
-                              className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                              title="Descargar comprobante"
-                            >
-                              📄
-                            </button>
-                          )}
-                          <button
-                            onClick={() => deleteAppointment(appointment.id)}
-                            className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                            title="Eliminar cita"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
+        {/* Content Area */}
+        {activeTab === 'appointments' && (
+          /* Appointments Table */
+          <div className="elegant-card rounded-3xl p-6">
+            <h2 className="text-xl font-semibold text-golden-brown mb-6">
+              Lista de Citas ({appointments.length})
+            </h2>
+            
+            {appointments.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No hay citas registradas
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-golden-brown border-opacity-20">
+                      <th className="text-left py-3 px-2 font-semibold text-golden-brown">Fecha</th>
+                      <th className="text-left py-3 px-2 font-semibold text-golden-brown">Hora</th>
+                      <th className="text-left py-3 px-2 font-semibold text-golden-brown">Cliente</th>
+                      <th className="text-left py-3 px-2 font-semibold text-golden-brown">WhatsApp</th>
+                      <th className="text-left py-3 px-2 font-semibold text-golden-brown">Pago</th>
+                      <th className="text-left py-3 px-2 font-semibold text-golden-brown">Estado</th>
+                      <th className="text-left py-3 px-2 font-semibold text-golden-brown">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {appointments.map((appointment) => (
+                      <tr key={appointment.id} className="border-b border-gray-200">
+                        <td className="py-3 px-2">{appointment.appointment_date}</td>
+                        <td className="py-3 px-2">{appointment.appointment_time}</td>
+                        <td className="py-3 px-2">
+                          <div>
+                            <div className="font-medium">{appointment.full_name}</div>
+                            <div className="text-sm text-gray-500">{appointment.email}</div>
+                          </div>
+                        </td>
+                        <td className="py-3 px-2">
+                          <a 
+                            href={`https://wa.me/${appointment.whatsapp.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-green-600 hover:text-green-800"
+                          >
+                            {appointment.whatsapp}
+                          </a>
+                        </td>
+                        <td className="py-3 px-2">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            appointment.payment_method === 'paypal' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                          }`}>
+                            {appointment.payment_method === 'paypal' ? 'PayPal' : 'Zelle'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-2">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(appointment.status)}`}>
+                            {getStatusText(appointment.status)}
+                          </span>
+                        </td>
+                        <td className="py-3 px-2">
+                          <div className="flex space-x-2">
+                            {appointment.payment_method === 'zelle' && appointment.status !== 'confirmed' && (
+                              <button
+                                onClick={() => confirmZellePayment(appointment.id)}
+                                className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
+                                title="Confirmar pago Zelle"
+                              >
+                                ✓
+                              </button>
+                            )}
+                            {appointment.zelle_receipt && (
+                              <button
+                                onClick={() => {
+                                  const link = document.createElement('a');
+                                  link.href = `data:image/jpeg;base64,${appointment.zelle_receipt}`;
+                                  link.download = `comprobante_${appointment.id}.jpg`;
+                                  link.click();
+                                }}
+                                className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                                title="Descargar comprobante"
+                              >
+                                📄
+                              </button>
+                            )}
+                            <button
+                              onClick={() => deleteAppointment(appointment.id)}
+                              className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                              title="Eliminar cita"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          /* Settings Panel */
+          <div className="elegant-card rounded-3xl p-6">
+            <h2 className="text-xl font-semibold text-golden-brown mb-6">
+              ⚙️ Configuración de Pagos
+            </h2>
+            
+            <div className="max-w-2xl">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center space-x-2">
+                  <span className="text-blue-600">ℹ️</span>
+                  <p className="text-blue-800 font-medium">Configuración de Zelle</p>
+                </div>
+                <p className="text-blue-700 text-sm mt-2">
+                  Aquí puedes cambiar el email donde los clientes enviarán los pagos por Zelle y el precio de las consultas.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-golden-brown font-medium mb-2">
+                    📧 Email para pagos Zelle
+                  </label>
+                  <input
+                    type="email"
+                    value={settings.zelle_email}
+                    onChange={(e) => setSettings({...settings, zelle_email: e.target.value})}
+                    className="form-input w-full p-4 rounded-lg"
+                    placeholder="tu-email@gmail.com"
+                  />
+                  <p className="text-sm text-gray-600 mt-1">
+                    Los clientes enviarán pagos Zelle a este email
+                  </p>
+                </div>
+                
+                <div>
+                  <label className="block text-golden-brown font-medium mb-2">
+                    💰 Precio de consulta (USD)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={settings.consultation_price}
+                    onChange={(e) => setSettings({...settings, consultation_price: parseFloat(e.target.value) || 0})}
+                    className="form-input w-full p-4 rounded-lg"
+                    placeholder="50.00"
+                  />
+                  <p className="text-sm text-gray-600 mt-1">
+                    Precio que se mostrará a los clientes
+                  </p>
+                </div>
+
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-green-800 font-medium mb-2">Vista previa:</p>
+                  <p className="text-green-700">
+                    Los clientes verán: "Envía <strong>${settings.consultation_price?.toFixed(2) || '50.00'} USD</strong> a <strong>{settings.zelle_email || 'tu-email@gmail.com'}</strong>"
+                  </p>
+                </div>
+
+                <button
+                  onClick={updateSettings}
+                  disabled={settingsLoading}
+                  className="btn-primary px-8 py-3 rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {settingsLoading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="loading-spinner"></div>
+                      <span>Guardando...</span>
+                    </div>
+                  ) : (
+                    '💾 Guardar Configuración'
+                  )}
+                </button>
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         <div className="mt-8 text-center">
           <button
