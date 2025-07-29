@@ -177,6 +177,23 @@ async def get_available_slots(date: str):
 async def create_paypal_order(booking: AppointmentBooking):
     """Create PayPal payment order"""
     try:
+        # Get current pricing settings
+        settings = await db.settings.find_one({"type": "zelle_config"})
+        base_price = settings.get("consultation_price", 50.00) if settings else 50.00
+        half_hour_ext = settings.get("half_hour_extension", 25.00) if settings else 25.00
+        full_hour_ext = settings.get("full_hour_extension", 45.00) if settings else 45.00
+        
+        # Calculate final price based on session duration
+        if booking.session_duration == "plus_30min":
+            final_price = base_price + half_hour_ext
+            session_description = "1.5 horas (60min + 30min extra)"
+        elif booking.session_duration == "plus_60min":
+            final_price = base_price + full_hour_ext
+            session_description = "2 horas (60min + 60min extra)"
+        else:
+            final_price = base_price
+            session_description = "1 hora (sesión estándar)"
+        
         # Create appointment in database with pending status
         appointment_id = str(uuid.uuid4())
         appointment_data = {
@@ -187,6 +204,8 @@ async def create_paypal_order(booking: AppointmentBooking):
             "appointment_date": booking.appointment_date,
             "appointment_time": booking.appointment_time,
             "payment_method": "paypal",
+            "session_duration": booking.session_duration,
+            "session_price": final_price,
             "status": "pending",
             "created_at": datetime.now(VET).isoformat()
         }
@@ -206,18 +225,18 @@ async def create_paypal_order(booking: AppointmentBooking):
             "transactions": [{
                 "item_list": {
                     "items": [{
-                        "name": "Consulta Psicológica - Liz Parra",
-                        "sku": "psych-consultation",
-                        "price": "50.00",  # Adjust price as needed
+                        "name": f"Consulta Psicológica - Liz Parra ({session_description})",
+                        "sku": f"psych-consultation-{booking.session_duration}",
+                        "price": f"{final_price:.2f}",
                         "currency": "USD",
                         "quantity": 1
                     }]
                 },
                 "amount": {
-                    "total": "50.00",
+                    "total": f"{final_price:.2f}",
                     "currency": "USD"
                 },
-                "description": f"Cita psicológica para {booking.full_name} - {booking.appointment_date} {booking.appointment_time}"
+                "description": f"Cita psicológica para {booking.full_name} - {booking.appointment_date} {booking.appointment_time} - {session_description}"
             }]
         })
         
