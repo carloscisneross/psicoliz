@@ -10,6 +10,8 @@ const BookingFlow = () => {
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState('');
+  const [selectedDuration, setSelectedDuration] = useState('standard');
+  const [pricingConfig, setPricingConfig] = useState({});
   const [availableTimes, setAvailableTimes] = useState([]);
   const [formData, setFormData] = useState({
     full_name: '',
