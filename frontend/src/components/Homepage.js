@@ -13,7 +13,7 @@ const Homepage = () => {
             {/* Profile Image */}
             <div className="mb-8">
               <img
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjB3b21hbnxlbnwwfHx8fDE3NTM3NTMwMDR8MA&ixlib=rb-4.1.0&q=85"
+                src="https://customer-assets.emergentagent.com/job_parra-psico/artifacts/ixqpyybc_IMG_3205.PNG"
                 alt="Liz Parra - Psicóloga"
                 className="w-48 h-48 rounded-full mx-auto profile-image object-cover"
               />
