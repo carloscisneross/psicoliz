@@ -18,6 +18,7 @@ function App() {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
           <Route path="/zelle-instructions/:bookingId" element={<ZelleInstructions />} />
+          <Route path="/admin" element={<AdminPanel />} />
         </Routes>
       </div>
     </Router>
