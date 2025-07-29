@@ -10,11 +10,8 @@ import uuid
 import base64
 import json
 import paypalrestsdk
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email import encoders
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 import pytz
 from dotenv import load_dotenv
 
@@ -43,12 +40,8 @@ paypalrestsdk.configure({
     "client_secret": os.getenv("PAYPAL_CLIENT_SECRET")
 })
 
-# SMTP configuration
-SMTP_SERVER = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
-SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
-SMTP_USERNAME = os.getenv('SMTP_USERNAME')
-SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
-FROM_EMAIL = os.getenv('FROM_EMAIL')
+# SendGrid configuration
+sg = SendGridAPIClient(api_key=os.getenv('SENDGRID_API_KEY'))
 
 # Venezuela timezone
 VET = pytz.timezone('America/Caracas')
@@ -262,38 +255,30 @@ async def upload_zelle_proof(
         raise HTTPException(status_code=500, detail=str(e))
 
 async def send_confirmation_emails(appointment):
-    """Send confirmation emails to user and Liz using SMTP"""
+    """Send confirmation emails to user and Liz"""
     try:
         # User confirmation email
-        user_msg = MIMEMultipart('alternative')
-        user_msg['Subject'] = 'Confirmación de Cita - Liz Parra Psicóloga'
-        user_msg['From'] = FROM_EMAIL
-        user_msg['To'] = appointment['email']
-        
-        user_html = f'''
-        <h2>¡Tu cita ha sido confirmada!</h2>
-        <p>Hola {appointment['full_name']},</p>
-        <p>Tu cita psicológica ha sido confirmada para:</p>
-        <ul>
-            <li><strong>Fecha:</strong> {appointment['appointment_date']}</li>
-            <li><strong>Hora:</strong> {appointment['appointment_time']}</li>
-            <li><strong>Método de pago:</strong> {appointment['payment_method']}</li>
-        </ul>
-        <p><strong>Importante:</strong> Liz se contactará contigo por WhatsApp en la hora de tu cita.</p>
-        <p>¡Nos vemos pronto!</p>
-        <p>Saludos,<br>Liz Parra<br>Psicóloga</p>
-        '''
-        
-        user_html_part = MIMEText(user_html, 'html')
-        user_msg.attach(user_html_part)
+        user_message = Mail(
+            from_email=os.getenv('FROM_EMAIL'),
+            to_emails=appointment['email'],
+            subject='Confirmación de Cita - Liz Parra Psicóloga',
+            html_content=f'''
+            <h2>¡Tu cita ha sido confirmada!</h2>
+            <p>Hola {appointment['full_name']},</p>
+            <p>Tu cita psicológica ha sido confirmada para:</p>
+            <ul>
+                <li><strong>Fecha:</strong> {appointment['appointment_date']}</li>
+                <li><strong>Hora:</strong> {appointment['appointment_time']}</li>
+                <li><strong>Método de pago:</strong> {appointment['payment_method']}</li>
+            </ul>
+            <p><strong>Importante:</strong> Liz se contactará contigo por WhatsApp en la hora de tu cita.</p>
+            <p>¡Nos vemos pronto!</p>
+            <p>Saludos,<br>Liz Parra<br>Psicóloga</p>
+            '''
+        )
         
         # Liz notification email
-        liz_msg = MIMEMultipart('mixed')
-        liz_msg['Subject'] = f'Nueva Cita - {appointment["full_name"]} - {appointment["appointment_date"]}'
-        liz_msg['From'] = FROM_EMAIL
-        liz_msg['To'] = os.getenv('LIZA_EMAIL')
-        
-        liz_html = f'''
+        liz_content = f'''
         <h2>Nueva Cita Reservada</h2>
         <p><strong>Cliente:</strong> {appointment['full_name']}</p>
         <p><strong>WhatsApp:</strong> {appointment['whatsapp']}</p>
@@ -303,31 +288,26 @@ async def send_confirmation_emails(appointment):
         <p><strong>Método de pago:</strong> {appointment['payment_method']}</p>
         '''
         
-        liz_html_part = MIMEText(liz_html, 'html')
-        liz_msg.attach(liz_html_part)
+        liz_message = Mail(
+            from_email=os.getenv('FROM_EMAIL'),
+            to_emails=os.getenv('LIZA_EMAIL'),
+            subject=f'Nueva Cita - {appointment["full_name"]} - {appointment["appointment_date"]}',
+            html_content=liz_content
+        )
         
         # Add Zelle receipt attachment if exists
         if appointment.get('zelle_receipt'):
-            attachment_data = base64.b64decode(appointment['zelle_receipt'])
-            attachment = MIMEBase('application', 'octet-stream')
-            attachment.set_payload(attachment_data)
-            encoders.encode_base64(attachment)
-            attachment.add_header(
-                'Content-Disposition',
-                f'attachment; filename={appointment.get("zelle_receipt_filename", "receipt.jpg")}'
+            attachment = Attachment(
+                FileContent(appointment['zelle_receipt']),
+                FileName(appointment.get('zelle_receipt_filename', 'receipt.jpg')),
+                FileType('image/jpeg'),
+                Disposition('attachment')
             )
-            liz_msg.attach(attachment)
+            liz_message.attachment = attachment
         
-        # Send emails using SMTP
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(SMTP_USERNAME, SMTP_PASSWORD)
-            
-            # Send user email
-            server.send_message(user_msg)
-            
-            # Send Liz email
-            server.send_message(liz_msg)
+        # Send emails
+        sg.send(user_message)
+        sg.send(liz_message)
         
     except Exception as e:
         print(f"Error sending emails: {str(e)}")
