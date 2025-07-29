@@ -11,7 +11,7 @@ const AdminPanel = () => {
   const [authenticated, setAuthenticated] = useState(false);
   const [error, setError] = useState('');
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 
   const authenticate = async () => {
     try {
