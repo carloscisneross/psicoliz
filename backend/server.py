@@ -637,6 +637,125 @@ async def update_admin_settings(settings_update: SettingsUpdate, admin: str = De
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/admin/schedule")
+async def get_admin_schedule(admin: str = Depends(get_admin_user)):
+    """Get current weekly schedule and custom overrides"""
+    try:
+        # Get current default schedule
+        schedule_settings = await db.settings.find_one({"type": "weekly_schedule"})
+        
+        if not schedule_settings:
+            # Create default schedule if none exists
+            default_schedule_settings = {
+                "type": "weekly_schedule",
+                "schedule": DEFAULT_SCHEDULE,
+                "created_at": datetime.now(VET).isoformat()
+            }
+            await db.settings.insert_one(default_schedule_settings)
+            current_schedule = DEFAULT_SCHEDULE
+        else:
+            current_schedule = schedule_settings.get("schedule", DEFAULT_SCHEDULE)
+        
+        # Get custom schedule overrides for the next 60 days
+        today = datetime.now(VET).date()
+        end_date = today + timedelta(days=60)
+        
+        custom_schedules = await db.custom_schedules.find({
+            "date": {"$gte": today.isoformat(), "$lte": end_date.isoformat()}
+        }).to_list(100)
+        
+        return {
+            "weekly_schedule": current_schedule,
+            "custom_schedules": custom_schedules
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/admin/schedule/weekly")
+async def update_weekly_schedule(schedule_update: dict, admin: str = Depends(get_admin_user)):
+    """Update weekly default schedule"""
+    try:
+        # Validate schedule format
+        valid_days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        for day in schedule_update.keys():
+            if day not in valid_days:
+                raise HTTPException(status_code=400, detail=f"Invalid day: {day}")
+            
+            # Validate time format
+            for time_slot in schedule_update[day]:
+                try:
+                    datetime.strptime(time_slot, "%H:%M")
+                except ValueError:
+                    raise HTTPException(status_code=400, detail=f"Invalid time format: {time_slot}")
+        
+        # Update or create weekly schedule
+        await db.settings.update_one(
+            {"type": "weekly_schedule"},
+            {"$set": {
+                "schedule": schedule_update,
+                "updated_at": datetime.now(VET).isoformat(),
+                "updated_by": admin
+            }},
+            upsert=True
+        )
+        
+        return {"message": "Weekly schedule updated successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/admin/schedule/custom")
+async def update_custom_schedule(custom_schedule: CustomSchedule, admin: str = Depends(get_admin_user)):
+    """Update custom schedule for specific date"""
+    try:
+        # Validate date format
+        try:
+            datetime.strptime(custom_schedule.date, "%Y-%m-%d")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+        
+        # Validate time format if available
+        if custom_schedule.is_available:
+            for time_slot in custom_schedule.available_times:
+                try:
+                    datetime.strptime(time_slot, "%H:%M")
+                except ValueError:
+                    raise HTTPException(status_code=400, detail=f"Invalid time format: {time_slot}")
+        
+        # Update or create custom schedule
+        await db.custom_schedules.update_one(
+            {"date": custom_schedule.date},
+            {"$set": {
+                "available_times": custom_schedule.available_times,
+                "is_available": custom_schedule.is_available,
+                "updated_at": datetime.now(VET).isoformat(),
+                "updated_by": admin
+            }},
+            upsert=True
+        )
+        
+        return {"message": f"Custom schedule updated for {custom_schedule.date}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/admin/schedule/custom/{date}")
+async def delete_custom_schedule(date: str, admin: str = Depends(get_admin_user)):
+    """Delete custom schedule for specific date (revert to weekly default)"""
+    try:
+        result = await db.custom_schedules.delete_one({"date": date})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Custom schedule not found for this date")
+        
+        return {"message": f"Custom schedule deleted for {date}. Reverted to weekly default."}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
