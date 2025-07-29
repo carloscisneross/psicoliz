@@ -127,6 +127,27 @@ const AdminPanel = () => {
     }
   };
 
+  const updateSettings = async () => {
+    try {
+      setSettingsLoading(true);
+      const auth = localStorage.getItem('adminAuth');
+      
+      await axios.put(`${backendUrl}/api/admin/settings`, settings, {
+        headers: { 
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      alert('Configuración actualizada exitosamente');
+    } catch (error) {
+      console.error('Error updating settings:', error);
+      alert('Error al actualizar la configuración');
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('adminAuth');
     setAuthenticated(false);
