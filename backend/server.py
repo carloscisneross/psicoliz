@@ -458,6 +458,66 @@ async def get_admin_stats(admin: str = Depends(get_admin_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/admin/settings")
+async def get_admin_settings(admin: str = Depends(get_admin_user)):
+    """Get admin settings"""
+    try:
+        settings = await db.settings.find_one({"type": "zelle_config"})
+        if not settings:
+            # Create default settings if none exist
+            default_settings = {
+                "type": "zelle_config",
+                "zelle_email": os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com'),
+                "consultation_price": 50.00,
+                "created_at": datetime.now(VET).isoformat()
+            }
+            await db.settings.insert_one(default_settings)
+            return {
+                "zelle_email": default_settings["zelle_email"],
+                "consultation_price": default_settings["consultation_price"]
+            }
+        
+        return {
+            "zelle_email": settings.get("zelle_email", os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com')),
+            "consultation_price": settings.get("consultation_price", 50.00)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/admin/settings")
+async def update_admin_settings(settings_update: SettingsUpdate, admin: str = Depends(get_admin_user)):
+    """Update admin settings"""
+    try:
+        # Validate email format
+        if "@" not in settings_update.zelle_email or "." not in settings_update.zelle_email:
+            raise HTTPException(status_code=400, detail="Invalid email format")
+        
+        # Validate price
+        if settings_update.consultation_price <= 0:
+            raise HTTPException(status_code=400, detail="Price must be greater than 0")
+        
+        # Update or create settings
+        result = await db.settings.update_one(
+            {"type": "zelle_config"},
+            {"$set": {
+                "zelle_email": settings_update.zelle_email,
+                "consultation_price": settings_update.consultation_price,
+                "updated_at": datetime.now(VET).isoformat(),
+                "updated_by": admin
+            }},
+            upsert=True
+        )
+        
+        return {
+            "message": "Settings updated successfully",
+            "zelle_email": settings_update.zelle_email,
+            "consultation_price": settings_update.consultation_price
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
