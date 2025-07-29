@@ -151,6 +151,14 @@ const Homepage = () => {
             <p className="text-white text-opacity-80">
               © 2024 Liz Parra - Psicóloga. Todos los derechos reservados.
             </p>
+            <div className="mt-4">
+              <button
+                onClick={() => navigate('/admin')}
+                className="text-white text-opacity-60 hover:text-opacity-80 text-sm transition-all duration-300"
+              >
+                Admin
+              </button>
+            </div>
           </div>
         </div>
       </footer>
