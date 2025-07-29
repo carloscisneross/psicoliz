@@ -362,6 +362,80 @@ async def get_appointments():
             appointment['_id'] = str(appointment['_id'])
     return appointments
 
+@app.get("/api/admin/appointments")
+async def get_admin_appointments(admin: str = Depends(get_admin_user)):
+    """Get all appointments with admin authentication"""
+    appointments = await db.appointments.find().sort("created_at", -1).to_list(1000)
+    # Convert ObjectId to string for JSON serialization
+    for appointment in appointments:
+        if '_id' in appointment:
+            appointment['_id'] = str(appointment['_id'])
+    return appointments
+
+@app.put("/api/admin/appointments/{appointment_id}/confirm-zelle")
+async def confirm_zelle_payment(appointment_id: str, admin: str = Depends(get_admin_user)):
+    """Confirm Zelle payment for an appointment"""
+    try:
+        result = await db.appointments.update_one(
+            {"id": appointment_id},
+            {"$set": {
+                "status": "confirmed",
+                "admin_confirmed_at": datetime.now(VET).isoformat(),
+                "admin_confirmed_by": admin
+            }}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Appointment not found")
+        
+        return {"message": "Zelle payment confirmed successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/admin/appointments/{appointment_id}")
+async def delete_appointment(appointment_id: str, admin: str = Depends(get_admin_user)):
+    """Delete an appointment"""
+    try:
+        result = await db.appointments.delete_one({"id": appointment_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Appointment not found")
+        
+        return {"message": "Appointment deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/admin/appointments/export")
+async def export_appointments(admin: str = Depends(get_admin_user)):
+    """Export appointments as CSV data"""
+    appointments = await db.appointments.find().sort("created_at", -1).to_list(1000)
+    
+    csv_data = "Date,Time,Name,Email,WhatsApp,Payment Method,Status,Created At\n"
+    for apt in appointments:
+        csv_data += f"{apt.get('appointment_date', '')},{apt.get('appointment_time', '')},{apt.get('full_name', '')},{apt.get('email', '')},{apt.get('whatsapp', '')},{apt.get('payment_method', '')},{apt.get('status', '')},{apt.get('created_at', '')}\n"
+    
+    return {"csv_data": csv_data}
+
+@app.get("/api/admin/stats")
+async def get_admin_stats(admin: str = Depends(get_admin_user)):
+    """Get appointment statistics"""
+    try:
+        total_appointments = await db.appointments.count_documents({})
+        confirmed_appointments = await db.appointments.count_documents({"status": "confirmed"})
+        pending_appointments = await db.appointments.count_documents({"status": {"$in": ["pending", "awaiting_payment_proof"]}})
+        paypal_appointments = await db.appointments.count_documents({"payment_method": "paypal"})
+        zelle_appointments = await db.appointments.count_documents({"payment_method": "zelle"})
+        
+        return {
+            "total_appointments": total_appointments,
+            "confirmed_appointments": confirmed_appointments,
+            "pending_appointments": pending_appointments,
+            "paypal_appointments": paypal_appointments,
+            "zelle_appointments": zelle_appointments
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
