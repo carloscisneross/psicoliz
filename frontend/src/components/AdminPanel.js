@@ -301,6 +301,32 @@ const AdminPanel = () => {
           </div>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="elegant-card rounded-3xl p-6 mb-8">
+          <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab('appointments')}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                activeTab === 'appointments' 
+                  ? 'bg-golden-brown text-white shadow-md' 
+                  : 'text-golden-brown hover:bg-white'
+              }`}
+            >
+              📅 Citas
+            </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                activeTab === 'settings' 
+                  ? 'bg-golden-brown text-white shadow-md' 
+                  : 'text-golden-brown hover:bg-white'
+              }`}
+            >
+              ⚙️ Configuración
+            </button>
+          </div>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid md:grid-cols-5 gap-4 mb-8">
           <div className="elegant-card rounded-2xl p-4 text-center">
