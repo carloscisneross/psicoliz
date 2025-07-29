@@ -399,11 +399,12 @@ const BookingFlow = () => {
                   <div className="space-y-2 text-gray-700">
                     <p><strong>Fecha:</strong> {selectedDate?.toLocaleDateString('es-ES')}</p>
                     <p><strong>Hora:</strong> {selectedTime}</p>
+                    <p><strong>Duración:</strong> {pricingConfig[selectedDuration]?.duration || 'Standard'}</p>
                     <p><strong>Nombre:</strong> {formData.full_name}</p>
                     <p><strong>Email:</strong> {formData.email}</p>
                     <p><strong>WhatsApp:</strong> {formData.whatsapp}</p>
                     <p><strong>Método de pago:</strong> {formData.payment_method === 'paypal' ? 'PayPal' : 'Zelle'}</p>
-                    <p><strong>Costo:</strong> $50.00 USD</p>
+                    <p><strong>Costo:</strong> ${pricingConfig[selectedDuration]?.price?.toFixed(2) || '50.00'} USD</p>
                   </div>
                 </div>
 
