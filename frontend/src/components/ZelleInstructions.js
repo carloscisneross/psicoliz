@@ -9,7 +9,7 @@ const ZelleInstructions = () => {
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
