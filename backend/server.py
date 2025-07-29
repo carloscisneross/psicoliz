@@ -89,6 +89,8 @@ class ZelleUpload(BaseModel):
 class SettingsUpdate(BaseModel):
     zelle_email: str
     consultation_price: float = 50.00
+    half_hour_extension: float = 25.00
+    full_hour_extension: float = 45.00
 
 # Available time slots
 AVAILABLE_TIMES = [
