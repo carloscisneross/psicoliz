@@ -96,6 +96,15 @@ AVAILABLE_TIMES = [
 async def health_check():
     return {"status": "healthy"}
 
+@app.get("/api/zelle-config")
+async def get_zelle_config():
+    """Get Zelle payment configuration"""
+    return {
+        "zelle_email": os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com'),
+        "amount": "$50.00",
+        "currency": "USD"
+    }
+
 @app.get("/api/available-slots/{date}")
 async def get_available_slots(date: str):
     """Get available time slots for a specific date"""
