@@ -5,6 +5,7 @@ import BookingFlow from './components/BookingFlow';
 import PaymentSuccess from './components/PaymentSuccess';
 import PaymentCancel from './components/PaymentCancel';
 import ZelleInstructions from './components/ZelleInstructions';
+import AdminPanel from './components/AdminPanel';
 import './App.css';
 
 function App() {
