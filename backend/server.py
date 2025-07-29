@@ -103,10 +103,20 @@ class CustomSchedule(BaseModel):
     is_available: bool = True  # False for holidays/blocked days
 
 # Available time slots
-AVAILABLE_TIMES = [
-    "09:00", "10:00", "11:00", "12:00", 
-    "14:00", "15:00", "16:00", "17:00", "18:00"
-]
+DEFAULT_SCHEDULE = {
+    "monday": ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    "tuesday": ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    "wednesday": ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    "thursday": ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    "friday": ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    "saturday": ["09:00", "10:00", "11:00"],
+    "sunday": []  # Closed on Sundays
+}
+
+WEEKDAY_NAMES = {
+    0: "monday", 1: "tuesday", 2: "wednesday", 3: "thursday", 
+    4: "friday", 5: "saturday", 6: "sunday"
+}
 
 @app.get("/api/health")
 async def health_check():
@@ -169,6 +179,21 @@ async def get_available_slots(date: str):
         # Parse the date
         appointment_date = datetime.strptime(date, "%Y-%m-%d").date()
         
+        # Get day of week (0=Monday, 6=Sunday)
+        day_of_week = appointment_date.weekday()
+        day_name = WEEKDAY_NAMES[day_of_week]
+        
+        # Get default schedule for this day
+        day_schedule = DEFAULT_SCHEDULE.get(day_name, [])
+        
+        # Check for custom schedule override for this specific date
+        custom_schedule = await db.custom_schedules.find_one({"date": date})
+        if custom_schedule:
+            if not custom_schedule.get("is_available", True):
+                # Day is blocked/holiday
+                return {"available_times": []}
+            day_schedule = custom_schedule.get("available_times", day_schedule)
+        
         # Get existing bookings for this date
         existing_bookings = await db.appointments.find({
             "appointment_date": date,
@@ -176,7 +201,7 @@ async def get_available_slots(date: str):
         }).to_list(100)
         
         booked_times = [booking["appointment_time"] for booking in existing_bookings]
-        available_times = [time for time in AVAILABLE_TIMES if time not in booked_times]
+        available_times = [time for time in day_schedule if time not in booked_times]
         
         return {"available_times": available_times}
     except Exception as e:
