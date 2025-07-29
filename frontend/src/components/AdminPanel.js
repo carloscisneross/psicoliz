@@ -873,6 +873,120 @@ const AdminPanel = () => {
                   </div>
                 </div>
 
+                {/* Quick Schedule Editor */}
+                <div className="border-t border-gray-200 pt-6 mt-6">
+                  <h3 className="text-lg font-semibold text-golden-brown mb-4">
+                    🕐 Horarios de Trabajo (Vista Rápida)
+                  </h3>
+                  
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-yellow-600">💡</span>
+                      <p className="text-yellow-800 font-medium">Configuración Rápida</p>
+                    </div>
+                    <p className="text-yellow-700 text-sm mt-2">
+                      Aquí puedes ver y modificar tus horarios básicos. Para gestión avanzada (días específicos, excepciones), usa la pestaña "🕐 Horarios".
+                    </p>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Weekdays */}
+                    <div>
+                      <h4 className="font-medium text-golden-brown mb-3">Lunes a Viernes</h4>
+                      <div className="space-y-2">
+                        {schedule.weekly_schedule?.monday?.map((time, index) => (
+                          <div key={index} className="flex items-center justify-between bg-white p-2 rounded border">
+                            <span className="text-sm font-medium">{time}</span>
+                            <button
+                              onClick={() => {
+                                const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+                                const newSchedule = { ...schedule.weekly_schedule };
+                                days.forEach(day => {
+                                  newSchedule[day] = newSchedule[day]?.filter((_, i) => i !== index) || [];
+                                });
+                                setSchedule({ ...schedule, weekly_schedule: newSchedule });
+                              }}
+                              className="text-red-500 hover:text-red-700 text-xs px-2 py-1"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        )) || []}
+                        <button
+                          onClick={() => {
+                            const newTime = prompt('Nueva hora (formato HH:MM):', '09:00');
+                            if (newTime && /^\d{2}:\d{2}$/.test(newTime)) {
+                              const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+                              const newSchedule = { ...schedule.weekly_schedule };
+                              days.forEach(day => {
+                                newSchedule[day] = [...(newSchedule[day] || []), newTime].sort();
+                              });
+                              setSchedule({ ...schedule, weekly_schedule: newSchedule });
+                            }
+                          }}
+                          className="w-full bg-green-100 text-green-700 p-2 rounded border border-green-300 hover:bg-green-200 text-sm"
+                        >
+                          + Agregar hora a días laborales
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Weekend */}
+                    <div>
+                      <h4 className="font-medium text-golden-brown mb-3">Sábado</h4>
+                      <div className="space-y-2">
+                        {schedule.weekly_schedule?.saturday?.map((time, index) => (
+                          <div key={index} className="flex items-center justify-between bg-white p-2 rounded border">
+                            <span className="text-sm font-medium">{time}</span>
+                            <button
+                              onClick={() => {
+                                const newSchedule = { ...schedule.weekly_schedule };
+                                newSchedule.saturday = newSchedule.saturday?.filter((_, i) => i !== index) || [];
+                                setSchedule({ ...schedule, weekly_schedule: newSchedule });
+                              }}
+                              className="text-red-500 hover:text-red-700 text-xs px-2 py-1"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        )) || []}
+                        <button
+                          onClick={() => {
+                            const newTime = prompt('Nueva hora para sábado (formato HH:MM):', '09:00');
+                            if (newTime && /^\d{2}:\d{2}$/.test(newTime)) {
+                              const newSchedule = { ...schedule.weekly_schedule };
+                              newSchedule.saturday = [...(newSchedule.saturday || []), newTime].sort();
+                              setSchedule({ ...schedule, weekly_schedule: newSchedule });
+                            }
+                          }}
+                          className="w-full bg-blue-100 text-blue-700 p-2 rounded border border-blue-300 hover:bg-blue-200 text-sm"
+                        >
+                          + Agregar hora al sábado
+                        </button>
+                      </div>
+                      
+                      <div className="mt-4">
+                        <div className="flex items-center justify-between bg-gray-50 p-2 rounded border">
+                          <span className="text-sm font-medium text-gray-700">🌴 Domingo</span>
+                          <span className="text-xs text-gray-500">
+                            {schedule.weekly_schedule?.sunday?.length > 0 ? 'Disponible' : 'Cerrado'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={updateWeeklySchedule}
+                      disabled={scheduleLoading}
+                      className="bg-blue-500 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-600 disabled:opacity-50"
+                    >
+                      {scheduleLoading ? 'Guardando...' : '🕐 Guardar Horarios'}
+                    </button>
+                  </div>
+                </div>
+
                 <button
                   onClick={updateSettings}
                   disabled={settingsLoading}
