@@ -33,7 +33,8 @@ const BookingFlow = () => {
   useEffect(() => {
     const loadPricing = async () => {
       try {
-        const response = await axios.get(`${backendUrl}/api/pricing-config`);
+        const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
+        const response = await axios.get(`${apiUrl}/pricing-config`);
         setPricingConfig(response.data);
       } catch (error) {
         console.error('Error loading pricing:', error);
