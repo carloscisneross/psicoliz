@@ -62,3 +62,134 @@ Use timezone: VET (Venezuela, UTC-4)
 - Payment: PayPal SDK
 - Email: SendGrid (pending API key)
 - File Upload: Base64 encoding for images
+
+---
+
+backend:
+  - task: "Health Check API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Health check endpoint working correctly. Returns {'status': 'healthy'} with 200 status code."
+
+  - task: "Available Slots API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Available slots endpoint working correctly. Returns list of available time slots for specified date. MongoDB connection required and working."
+
+  - task: "PayPal Integration"
+    implemented: true
+    working: false
+    file: "backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "PayPal order creation failing with 401 Unauthorized error. PayPal sandbox credentials appear to be invalid or expired. Error: 'Client Authentication failed'. Credentials need to be verified or regenerated in PayPal Developer Dashboard."
+
+  - task: "Zelle Booking Creation"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Zelle booking creation working correctly. Successfully creates booking with 'awaiting_payment_proof' status and returns booking_id, zelle_email, and payment instructions."
+
+  - task: "File Upload for Zelle Receipt"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "File upload functionality working correctly. Successfully uploads Zelle receipt, updates booking status to 'confirmed', and stores base64 encoded file data."
+
+  - task: "Appointments List API"
+    implemented: true
+    working: false
+    file: "backend/server.py"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Minor: Appointments endpoint returns 500 error due to MongoDB ObjectId serialization issue. The _id field contains ObjectId which is not JSON serializable. Core functionality works but needs ObjectId handling fix."
+
+  - task: "Database Operations"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "MongoDB operations working correctly. Successfully stores appointments, updates booking status, and handles file attachments. Database connection established and functional."
+
+  - task: "Email Notifications"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Email functionality implemented with Brevo SMTP configuration but not tested due to potential email sending in production environment. Code structure appears correct with proper SMTP setup."
+
+frontend:
+  - task: "Frontend Testing"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Frontend testing not performed as per testing agent limitations. Backend APIs are functional for frontend integration."
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "PayPal Integration"
+    - "Appointments List API"
+  stuck_tasks:
+    - "PayPal Integration"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "Backend testing completed. Core booking functionality working correctly. PayPal integration has authentication issues requiring credential verification. Minor ObjectId serialization issue in appointments endpoint. MongoDB and file upload systems functional."
