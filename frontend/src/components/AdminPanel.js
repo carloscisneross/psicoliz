@@ -403,6 +403,16 @@ const AdminPanel = () => {
               📅 Citas
             </button>
             <button
+              onClick={() => setActiveTab('schedule')}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                activeTab === 'schedule' 
+                  ? 'bg-golden-brown text-white shadow-md' 
+                  : 'text-golden-brown hover:bg-white'
+              }`}
+            >
+              🕐 Horarios
+            </button>
+            <button
               onClick={() => setActiveTab('settings')}
               className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
                 activeTab === 'settings' 
