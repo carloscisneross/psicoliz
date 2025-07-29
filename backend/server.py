@@ -121,6 +121,38 @@ async def get_zelle_config():
         "currency": "USD"
     }
 
+@app.get("/api/pricing-config")
+async def get_pricing_config():
+    """Get pricing configuration for all session types"""
+    settings = await db.settings.find_one({"type": "zelle_config"})
+    if settings:
+        base_price = settings.get("consultation_price", 50.00)
+        half_hour_ext = settings.get("half_hour_extension", 25.00)
+        full_hour_ext = settings.get("full_hour_extension", 45.00)
+    else:
+        base_price = 50.00
+        half_hour_ext = 25.00
+        full_hour_ext = 45.00
+    
+    return {
+        "standard": {
+            "duration": "1 hora",
+            "price": base_price,
+            "description": "Sesión estándar de 60 minutos"
+        },
+        "plus_30min": {
+            "duration": "1.5 horas",
+            "price": base_price + half_hour_ext,
+            "description": "Sesión estándar + 30 minutos adicionales"
+        },
+        "plus_60min": {
+            "duration": "2 horas", 
+            "price": base_price + full_hour_ext,
+            "description": "Sesión estándar + 60 minutos adicionales"
+        },
+        "currency": "USD"
+    }
+
 @app.get("/api/available-slots/{date}")
 async def get_available_slots(date: str):
     """Get available time slots for a specific date"""
