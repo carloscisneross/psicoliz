@@ -93,6 +93,15 @@ class SettingsUpdate(BaseModel):
     half_hour_extension: float = 25.00
     full_hour_extension: float = 45.00
 
+class ScheduleUpdate(BaseModel):
+    day_of_week: str  # "monday", "tuesday", etc.
+    available_times: List[str]  # ["09:00", "10:00", etc.]
+
+class CustomSchedule(BaseModel):
+    date: str  # "2024-07-30"
+    available_times: List[str]  # Override for specific date
+    is_available: bool = True  # False for holidays/blocked days
+
 # Available time slots
 AVAILABLE_TIMES = [
     "09:00", "10:00", "11:00", "12:00", 
