@@ -86,7 +86,8 @@ const BookingFlow = () => {
       const bookingData = {
         ...formData,
         appointment_date: selectedDate.toISOString().split('T')[0],
-        appointment_time: selectedTime
+        appointment_time: selectedTime,
+        session_duration: selectedDuration
       };
 
       if (formData.payment_method === 'paypal') {
