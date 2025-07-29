@@ -336,6 +336,10 @@ async def send_confirmation_emails(appointment):
 async def get_appointments():
     """Get all appointments (for admin panel)"""
     appointments = await db.appointments.find().to_list(1000)
+    # Convert ObjectId to string for JSON serialization
+    for appointment in appointments:
+        if '_id' in appointment:
+            appointment['_id'] = str(appointment['_id'])
     return appointments
 
 if __name__ == "__main__":
