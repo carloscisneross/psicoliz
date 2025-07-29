@@ -261,12 +261,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "PayPal Integration"
-    - "Appointments List API"
     - "Admin Panel UI"
     - "Frontend-Backend Integration"
   stuck_tasks:
-    - "PayPal Integration"
     - "Admin Panel UI"
     - "Frontend-Backend Integration"
   test_all: false
