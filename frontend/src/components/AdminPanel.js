@@ -308,6 +308,33 @@ const AdminPanel = () => {
                 <p className="text-gray-600">Liz Parra - Psicóloga</p>
               </div>
               
+              {/* Test Button */}
+              <div className="mb-4 text-center">
+                <button
+                  onClick={async () => {
+                    try {
+                      console.log('Testing direct authentication...');
+                      const testAuth = btoa('liz:psico2024');
+                      console.log('Test auth string:', testAuth);
+                      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
+                      console.log('Test API URL:', `${apiUrl}/admin/stats`);
+                      
+                      const response = await axios.get(`${apiUrl}/admin/stats`, {
+                        headers: { 'Authorization': `Basic ${testAuth}` }
+                      });
+                      console.log('Test response:', response.data);
+                      alert('Direct test successful!');
+                    } catch (error) {
+                      console.error('Direct test failed:', error);
+                      alert('Direct test failed: ' + error.message);
+                    }
+                  }}
+                  className="bg-red-500 text-white px-4 py-2 rounded text-sm mb-4"
+                >
+                  🔧 Test Direct Auth
+                </button>
+              </div>
+              
               {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                   {error}
