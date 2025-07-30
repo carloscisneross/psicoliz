@@ -91,7 +91,8 @@ const AdminPanel = () => {
   const confirmZellePayment = async (appointmentId) => {
     try {
       const auth = localStorage.getItem('adminAuth');
-      await axios.put(`${backendUrl}/api/admin/appointments/${appointmentId}/confirm-zelle`, {}, {
+      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
+      await axios.put(`${apiUrl}/admin/appointments/${appointmentId}/confirm-zelle`, {}, {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       
