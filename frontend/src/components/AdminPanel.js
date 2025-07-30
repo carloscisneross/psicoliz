@@ -127,7 +127,8 @@ const AdminPanel = () => {
   const exportAppointments = async () => {
     try {
       const auth = localStorage.getItem('adminAuth');
-      const response = await axios.get(`${backendUrl}/api/admin/appointments/export`, {
+      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
+      const response = await axios.get(`${apiUrl}/admin/appointments/export`, {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       
