@@ -31,29 +31,50 @@ const AdminPanel = () => {
       setError('');
       const auth = btoa(`${credentials.username}:${credentials.password}`);
       
-      // Debug logging
-      console.log('Backend URL:', backendUrl);
-      console.log('Credentials:', credentials.username, credentials.password);
-      console.log('Auth string:', auth);
+      // Try the current window origin first (for preview environment)
+      let apiUrl = `${window.location.origin}/api`;
       
-      // Test authentication with stats endpoint
-      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
-      console.log('Final API URL:', `${apiUrl}/admin/stats`);
-      
-      const response = await axios.get(`${apiUrl}/admin/stats`, {
-        headers: {
-          'Authorization': `Basic ${auth}`
+      try {
+        const response = await axios.get(`${apiUrl}/admin/stats`, {
+          headers: { 'Authorization': `Basic ${auth}` },
+          timeout: 5000
+        });
+        
+        // Store credentials for future requests
+        localStorage.setItem('adminAuth', auth);
+        setAuthenticated(true);
+        loadData();
+        return;
+      } catch (error) {
+        // If that fails, try localhost (for local development)
+        if (error.response?.status !== 401) {
+          apiUrl = 'http://localhost:8001/api';
+          try {
+            const response = await axios.get(`${apiUrl}/admin/stats`, {
+              headers: { 'Authorization': `Basic ${auth}` },
+              timeout: 5000
+            });
+            
+            localStorage.setItem('adminAuth', auth);
+            setAuthenticated(true);
+            loadData();
+            return;
+          } catch (localError) {
+            if (localError.response?.status === 401) {
+              setError('Credenciales incorrectas');
+              return;
+            }
+          }
         }
-      });
-      
-      console.log('Authentication successful!', response.data);
-      
-      // Store credentials for future requests
-      localStorage.setItem('adminAuth', auth);
-      setAuthenticated(true);
-      loadData();
+        
+        if (error.response?.status === 401) {
+          setError('Credenciales incorrectas');
+        } else {
+          setError('Error de conexión al servidor');
+        }
+      }
     } catch (error) {
-      setError('Credenciales incorrectas');
+      setError('Error inesperado: ' + error.message);
       console.error('Authentication failed:', error);
     }
   };
