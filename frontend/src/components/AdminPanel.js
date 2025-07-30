@@ -31,8 +31,15 @@ const AdminPanel = () => {
       setError('');
       const auth = btoa(`${credentials.username}:${credentials.password}`);
       
+      // Debug logging
+      console.log('Backend URL:', backendUrl);
+      console.log('Credentials:', credentials.username, credentials.password);
+      console.log('Auth string:', auth);
+      
       // Test authentication with stats endpoint
       const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
+      console.log('Final API URL:', `${apiUrl}/admin/stats`);
+      
       const response = await axios.get(`${apiUrl}/admin/stats`, {
         headers: {
           'Authorization': `Basic ${auth}`
