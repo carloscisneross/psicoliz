@@ -24,9 +24,7 @@ const AdminPanel = () => {
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [scheduleLoading, setScheduleLoading] = useState(false);
 
-  const backendUrl = process.env.NODE_ENV === 'development' 
-    ? (process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001')
-    : window.location.origin;
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 
   const authenticate = async () => {
     try {
