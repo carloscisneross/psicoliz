@@ -57,17 +57,18 @@ const AdminPanel = () => {
         return;
       }
 
+      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
       const [appointmentsRes, statsRes, settingsRes, scheduleRes] = await Promise.all([
-        axios.get(`${backendUrl}/api/admin/appointments`, {
+        axios.get(`${apiUrl}/admin/appointments`, {
           headers: { 'Authorization': `Basic ${auth}` }
         }),
-        axios.get(`${backendUrl}/api/admin/stats`, {
+        axios.get(`${apiUrl}/admin/stats`, {
           headers: { 'Authorization': `Basic ${auth}` }
         }),
-        axios.get(`${backendUrl}/api/admin/settings`, {
+        axios.get(`${apiUrl}/admin/settings`, {
           headers: { 'Authorization': `Basic ${auth}` }
         }),
-        axios.get(`${backendUrl}/api/admin/schedule`, {
+        axios.get(`${apiUrl}/admin/schedule`, {
           headers: { 'Authorization': `Basic ${auth}` }
         })
       ]);
