@@ -226,13 +226,14 @@ const AdminPanel = () => {
   const deleteCustomSchedule = async (date) => {
     try {
       const auth = localStorage.getItem('adminAuth');
+      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
       
-      await axios.delete(`${backendUrl}/api/admin/schedule/custom/${date}`, {
+      await axios.delete(`${apiUrl}/admin/schedule/custom/${date}`, {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       
       // Reload schedule data
-      const scheduleRes = await axios.get(`${backendUrl}/api/admin/schedule`, {
+      const scheduleRes = await axios.get(`${apiUrl}/admin/schedule`, {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       setSchedule(scheduleRes.data);
