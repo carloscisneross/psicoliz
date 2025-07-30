@@ -315,25 +315,47 @@ const AdminPanel = () => {
                 <button
                   onClick={async () => {
                     try {
-                      console.log('Testing direct authentication...');
+                      console.log('Environment check:', {
+                        NODE_ENV: process.env.NODE_ENV,
+                        REACT_APP_BACKEND_URL: process.env.REACT_APP_BACKEND_URL,
+                        window_origin: window.location.origin,
+                        current_backendUrl: backendUrl
+                      });
+                      
                       const testAuth = btoa('liz:psico2024');
                       console.log('Test auth string:', testAuth);
-                      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
-                      console.log('Test API URL:', `${apiUrl}/admin/stats`);
                       
-                      const response = await axios.get(`${apiUrl}/admin/stats`, {
-                        headers: { 'Authorization': `Basic ${testAuth}` }
-                      });
-                      console.log('Test response:', response.data);
-                      alert('Direct test successful!');
+                      // Try multiple URLs
+                      const testUrls = [
+                        `${backendUrl}/api/admin/stats`,
+                        `${window.location.origin}/api/admin/stats`,
+                        'http://localhost:8001/api/admin/stats'
+                      ];
+                      
+                      for (const url of testUrls) {
+                        try {
+                          console.log(`Testing URL: ${url}`);
+                          const response = await axios.get(url, {
+                            headers: { 'Authorization': `Basic ${testAuth}` },
+                            timeout: 5000
+                          });
+                          console.log(`SUCCESS with ${url}:`, response.data);
+                          alert(`✅ Success with ${url}`);
+                          return;
+                        } catch (error) {
+                          console.log(`FAILED with ${url}:`, error.message);
+                        }
+                      }
+                      
+                      alert('❌ All URLs failed - check console');
                     } catch (error) {
-                      console.error('Direct test failed:', error);
-                      alert('Direct test failed: ' + error.message);
+                      console.error('Test error:', error);
+                      alert('Test error: ' + error.message);
                     }
                   }}
                   className="bg-red-500 text-white px-4 py-2 rounded text-sm mb-4"
                 >
-                  🔧 Test Direct Auth
+                  🔧 Test Multiple URLs
                 </button>
               </div>
               
