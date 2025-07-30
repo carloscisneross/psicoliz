@@ -111,7 +111,8 @@ const AdminPanel = () => {
 
     try {
       const auth = localStorage.getItem('adminAuth');
-      await axios.delete(`${backendUrl}/api/admin/appointments/${appointmentId}`, {
+      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
+      await axios.delete(`${apiUrl}/admin/appointments/${appointmentId}`, {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       
