@@ -329,55 +329,6 @@ const AdminPanel = () => {
                 <p className="text-gray-600">Liz Parra - Psicóloga</p>
               </div>
               
-              {/* Test Button */}
-              <div className="mb-4 text-center">
-                <button
-                  onClick={async () => {
-                    try {
-                      console.log('Environment check:', {
-                        NODE_ENV: process.env.NODE_ENV,
-                        REACT_APP_BACKEND_URL: process.env.REACT_APP_BACKEND_URL,
-                        window_origin: window.location.origin,
-                        current_backendUrl: backendUrl
-                      });
-                      
-                      const testAuth = btoa('liz:psico2024');
-                      console.log('Test auth string:', testAuth);
-                      
-                      // Try multiple URLs
-                      const testUrls = [
-                        `${backendUrl}/api/admin/stats`,
-                        `${window.location.origin}/api/admin/stats`,
-                        'http://localhost:8001/api/admin/stats'
-                      ];
-                      
-                      for (const url of testUrls) {
-                        try {
-                          console.log(`Testing URL: ${url}`);
-                          const response = await axios.get(url, {
-                            headers: { 'Authorization': `Basic ${testAuth}` },
-                            timeout: 5000
-                          });
-                          console.log(`SUCCESS with ${url}:`, response.data);
-                          alert(`✅ Success with ${url}`);
-                          return;
-                        } catch (error) {
-                          console.log(`FAILED with ${url}:`, error.message);
-                        }
-                      }
-                      
-                      alert('❌ All URLs failed - check console');
-                    } catch (error) {
-                      console.error('Test error:', error);
-                      alert('Test error: ' + error.message);
-                    }
-                  }}
-                  className="bg-red-500 text-white px-4 py-2 rounded text-sm mb-4"
-                >
-                  🔧 Test Multiple URLs
-                </button>
-              </div>
-              
               {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                   {error}
