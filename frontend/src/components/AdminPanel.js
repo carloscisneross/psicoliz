@@ -32,7 +32,8 @@ const AdminPanel = () => {
       const auth = btoa(`${credentials.username}:${credentials.password}`);
       
       // Test authentication with stats endpoint
-      const response = await axios.get(`${backendUrl}/api/admin/stats`, {
+      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
+      const response = await axios.get(`${apiUrl}/admin/stats`, {
         headers: {
           'Authorization': `Basic ${auth}`
         }
