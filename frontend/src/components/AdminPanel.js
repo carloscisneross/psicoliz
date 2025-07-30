@@ -46,6 +46,8 @@ const AdminPanel = () => {
         }
       });
       
+      console.log('Authentication successful!', response.data);
+      
       // Store credentials for future requests
       localStorage.setItem('adminAuth', auth);
       setAuthenticated(true);
