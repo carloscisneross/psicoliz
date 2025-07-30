@@ -150,8 +150,9 @@ const AdminPanel = () => {
     try {
       setSettingsLoading(true);
       const auth = localStorage.getItem('adminAuth');
+      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
       
-      await axios.put(`${backendUrl}/api/admin/settings`, settings, {
+      await axios.put(`${apiUrl}/admin/settings`, settings, {
         headers: { 
           'Authorization': `Basic ${auth}`,
           'Content-Type': 'application/json'
