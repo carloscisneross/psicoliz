@@ -172,8 +172,9 @@ const AdminPanel = () => {
     try {
       setScheduleLoading(true);
       const auth = localStorage.getItem('adminAuth');
+      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
       
-      await axios.put(`${backendUrl}/api/admin/schedule/weekly`, schedule.weekly_schedule, {
+      await axios.put(`${apiUrl}/admin/schedule/weekly`, schedule.weekly_schedule, {
         headers: { 
           'Authorization': `Basic ${auth}`,
           'Content-Type': 'application/json'
