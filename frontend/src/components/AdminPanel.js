@@ -193,8 +193,9 @@ const AdminPanel = () => {
   const updateCustomSchedule = async (date, times, isAvailable = true) => {
     try {
       const auth = localStorage.getItem('adminAuth');
+      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
       
-      await axios.put(`${backendUrl}/api/admin/schedule/custom`, {
+      await axios.put(`${apiUrl}/admin/schedule/custom`, {
         date: date,
         available_times: times,
         is_available: isAvailable
@@ -206,7 +207,7 @@ const AdminPanel = () => {
       });
       
       // Reload schedule data
-      const scheduleRes = await axios.get(`${backendUrl}/api/admin/schedule`, {
+      const scheduleRes = await axios.get(`${apiUrl}/admin/schedule`, {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       setSchedule(scheduleRes.data);
