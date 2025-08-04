@@ -24,6 +24,11 @@ load_dotenv()
 
 app = FastAPI()
 
+# Root route for health check
+@app.get("/")
+def read_root():
+    return {"message": "Psicoliz Backend is running", "status": "healthy", "version": "1.0"}
+
 # Basic HTTP authentication
 security = HTTPBasic()
 
