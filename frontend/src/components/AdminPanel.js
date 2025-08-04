@@ -58,64 +58,25 @@ const AdminPanel = () => {
         return;
       }
 
-      // Try current origin first, then localhost
-      let apiUrl = `${window.location.origin}/api`;
-      
-      try {
-        const [appointmentsRes, statsRes, settingsRes, scheduleRes] = await Promise.all([
-          axios.get(`${apiUrl}/admin/appointments`, {
-            headers: { 'Authorization': `Basic ${auth}` }
-          }),
-          axios.get(`${apiUrl}/admin/stats`, {
-            headers: { 'Authorization': `Basic ${auth}` }
-          }),
-          axios.get(`${apiUrl}/admin/settings`, {
-            headers: { 'Authorization': `Basic ${auth}` }
-          }),
-          axios.get(`${apiUrl}/admin/schedule`, {
-            headers: { 'Authorization': `Basic ${auth}` }
-          })
-        ]);
+      const [appointmentsRes, statsRes, settingsRes, scheduleRes] = await Promise.all([
+        axios.get(getApiUrl(API_ENDPOINTS.ADMIN.APPOINTMENTS), {
+          headers: { 'Authorization': `Basic ${auth}` }
+        }),
+        axios.get(getApiUrl(API_ENDPOINTS.ADMIN.STATS), {
+          headers: { 'Authorization': `Basic ${auth}` }
+        }),
+        axios.get(getApiUrl(API_ENDPOINTS.ADMIN.SETTINGS), {
+          headers: { 'Authorization': `Basic ${auth}` }
+        }),
+        axios.get(getApiUrl(API_ENDPOINTS.ADMIN.SCHEDULE), {
+          headers: { 'Authorization': `Basic ${auth}` }
+        })
+      ]);
 
-        setAppointments(appointmentsRes.data);
-        setStats(statsRes.data);
-        setSettings(settingsRes.data);
-        setSchedule(scheduleRes.data);
-      } catch (error) {
-        // Try localhost if origin fails
-        if (error.response?.status !== 401) {
-          try {
-            apiUrl = 'http://localhost:8001/api';
-            const [appointmentsRes, statsRes, settingsRes, scheduleRes] = await Promise.all([
-              axios.get(`${apiUrl}/admin/appointments`, {
-                headers: { 'Authorization': `Basic ${auth}` }
-              }),
-              axios.get(`${apiUrl}/admin/stats`, {
-                headers: { 'Authorization': `Basic ${auth}` }
-              }),
-              axios.get(`${apiUrl}/admin/settings`, {
-                headers: { 'Authorization': `Basic ${auth}` }
-              }),
-              axios.get(`${apiUrl}/admin/schedule`, {
-                headers: { 'Authorization': `Basic ${auth}` }
-              })
-            ]);
-
-            setAppointments(appointmentsRes.data);
-            setStats(statsRes.data);
-            setSettings(settingsRes.data);
-            setSchedule(scheduleRes.data);
-          } catch (localError) {
-            if (localError.response?.status === 401) {
-              localStorage.removeItem('adminAuth');
-              setAuthenticated(false);
-            }
-          }
-        } else {
-          localStorage.removeItem('adminAuth');
-          setAuthenticated(false);
-        }
-      }
+      setAppointments(appointmentsRes.data);
+      setStats(statsRes.data);
+      setSettings(settingsRes.data);
+      setSchedule(scheduleRes.data);
     } catch (error) {
       console.error('Error loading data:', error);
       if (error.response?.status === 401) {
