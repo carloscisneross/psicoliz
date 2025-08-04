@@ -58,14 +58,24 @@ app.add_middleware(
 
 # MongoDB connection
 MONGO_URL = os.getenv("MONGO_URL")
+if not MONGO_URL:
+    raise ValueError("MONGO_URL environment variable is required")
+
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
 db = client.psicoliz
 
 # PayPal configuration
+PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
+PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET")
+PAYPAL_MODE = os.getenv("PAYPAL_MODE", "sandbox")
+
+if not PAYPAL_CLIENT_ID or not PAYPAL_CLIENT_SECRET:
+    print("Warning: PayPal credentials not found. PayPal payments will not work.")
+
 paypalrestsdk.configure({
-    "mode": os.getenv("PAYPAL_MODE", "sandbox"),
-    "client_id": os.getenv("PAYPAL_CLIENT_ID"),
-    "client_secret": os.getenv("PAYPAL_CLIENT_SECRET")
+    "mode": PAYPAL_MODE,
+    "client_id": PAYPAL_CLIENT_ID,
+    "client_secret": PAYPAL_CLIENT_SECRET
 })
 
 # SMTP configuration
@@ -74,6 +84,11 @@ SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
 SMTP_LOGIN = os.getenv('SMTP_LOGIN')
 SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
 FROM_EMAIL = os.getenv('FROM_EMAIL')
+LIZA_EMAIL = os.getenv('LIZA_EMAIL', 'psicolizparra@gmail.com')
+ZELLE_EMAIL = os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com')
+
+if not SMTP_SERVER or not SMTP_LOGIN or not SMTP_PASSWORD:
+    print("Warning: SMTP credentials not found. Email notifications will not work.")
 
 # Venezuela timezone
 VET = pytz.timezone('America/Caracas')
