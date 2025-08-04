@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
+import { getApiUrl, API_ENDPOINTS } from '../config/api';
 
 const BookingFlow = () => {
   const navigate = useNavigate();
