@@ -21,8 +21,6 @@ const BookingFlow = () => {
     payment_method: ''
   });
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-
   // Load available times when date changes
   useEffect(() => {
     if (selectedDate) {
@@ -34,15 +32,14 @@ const BookingFlow = () => {
   useEffect(() => {
     const loadPricing = async () => {
       try {
-        const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
-        const response = await axios.get(`${apiUrl}/pricing-config`);
+        const response = await axios.get(getApiUrl(API_ENDPOINTS.PRICING_CONFIG));
         setPricingConfig(response.data);
       } catch (error) {
         console.error('Error loading pricing:', error);
       }
     };
     loadPricing();
-  }, [backendUrl]);
+  }, []);
 
   const loadAvailableSlots = async () => {
     try {
