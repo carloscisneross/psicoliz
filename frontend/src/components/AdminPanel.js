@@ -91,8 +91,7 @@ const AdminPanel = () => {
   const confirmZellePayment = async (appointmentId) => {
     try {
       const auth = localStorage.getItem('adminAuth');
-      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
-      await axios.put(`${apiUrl}/admin/appointments/${appointmentId}/confirm-zelle`, {}, {
+      await axios.put(getApiUrl(`${API_ENDPOINTS.ADMIN.APPOINTMENTS}/${appointmentId}/confirm-zelle`), {}, {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       
@@ -111,8 +110,7 @@ const AdminPanel = () => {
 
     try {
       const auth = localStorage.getItem('adminAuth');
-      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
-      await axios.delete(`${apiUrl}/admin/appointments/${appointmentId}`, {
+      await axios.delete(getApiUrl(`${API_ENDPOINTS.ADMIN.APPOINTMENTS}/${appointmentId}`), {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       
@@ -127,8 +125,7 @@ const AdminPanel = () => {
   const exportAppointments = async () => {
     try {
       const auth = localStorage.getItem('adminAuth');
-      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
-      const response = await axios.get(`${apiUrl}/admin/appointments/export`, {
+      const response = await axios.get(getApiUrl(`${API_ENDPOINTS.ADMIN.APPOINTMENTS}/export`), {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       
@@ -150,9 +147,8 @@ const AdminPanel = () => {
     try {
       setSettingsLoading(true);
       const auth = localStorage.getItem('adminAuth');
-      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
       
-      await axios.put(`${apiUrl}/admin/settings`, settings, {
+      await axios.put(getApiUrl(API_ENDPOINTS.ADMIN.SETTINGS), settings, {
         headers: { 
           'Authorization': `Basic ${auth}`,
           'Content-Type': 'application/json'
@@ -172,9 +168,8 @@ const AdminPanel = () => {
     try {
       setScheduleLoading(true);
       const auth = localStorage.getItem('adminAuth');
-      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
       
-      await axios.put(`${apiUrl}/admin/schedule/weekly`, schedule.weekly_schedule, {
+      await axios.put(getApiUrl(API_ENDPOINTS.ADMIN.SCHEDULE_WEEKLY), schedule.weekly_schedule, {
         headers: { 
           'Authorization': `Basic ${auth}`,
           'Content-Type': 'application/json'
@@ -193,9 +188,8 @@ const AdminPanel = () => {
   const updateCustomSchedule = async (date, times, isAvailable = true) => {
     try {
       const auth = localStorage.getItem('adminAuth');
-      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
       
-      await axios.put(`${apiUrl}/admin/schedule/custom`, {
+      await axios.put(getApiUrl(API_ENDPOINTS.ADMIN.SCHEDULE_CUSTOM), {
         date: date,
         available_times: times,
         is_available: isAvailable
@@ -207,7 +201,7 @@ const AdminPanel = () => {
       });
       
       // Reload schedule data
-      const scheduleRes = await axios.get(`${apiUrl}/admin/schedule`, {
+      const scheduleRes = await axios.get(getApiUrl(API_ENDPOINTS.ADMIN.SCHEDULE), {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       setSchedule(scheduleRes.data);
@@ -226,14 +220,13 @@ const AdminPanel = () => {
   const deleteCustomSchedule = async (date) => {
     try {
       const auth = localStorage.getItem('adminAuth');
-      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
       
-      await axios.delete(`${apiUrl}/admin/schedule/custom/${date}`, {
+      await axios.delete(getApiUrl(`${API_ENDPOINTS.ADMIN.SCHEDULE_CUSTOM}/${date}`), {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       
       // Reload schedule data
-      const scheduleRes = await axios.get(`${apiUrl}/admin/schedule`, {
+      const scheduleRes = await axios.get(getApiUrl(API_ENDPOINTS.ADMIN.SCHEDULE), {
         headers: { 'Authorization': `Basic ${auth}` }
       });
       setSchedule(scheduleRes.data);
