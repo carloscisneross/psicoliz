@@ -45,8 +45,7 @@ const BookingFlow = () => {
     try {
       setLoading(true);
       const dateStr = selectedDate.toISOString().split('T')[0];
-      const apiUrl = backendUrl.includes('/api') ? backendUrl : `${backendUrl}/api`;
-      const response = await axios.get(`${apiUrl}/available-slots/${dateStr}`);
+      const response = await axios.get(getApiUrl(`${API_ENDPOINTS.AVAILABLE_SLOTS}/${dateStr}`));
       setAvailableTimes(response.data.available_times);
       console.log('Available times loaded:', response.data.available_times);
     } catch (error) {
