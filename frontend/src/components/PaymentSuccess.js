@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import { getApiUrl, API_ENDPOINTS } from '../config/api';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
-
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 
   useEffect(() => {
     const confirmPayment = async () => {
@@ -18,7 +17,7 @@ const PaymentSuccess = () => {
         const bookingId = searchParams.get('booking_id');
 
         if (paymentId && payerId && bookingId) {
-          await axios.post(`${backendUrl}/api/confirm-paypal-payment`, {
+          await axios.post(getApiUrl(API_ENDPOINTS.CONFIRM_PAYPAL_PAYMENT), {
             payment_id: paymentId,
             payer_id: payerId,
             booking_id: bookingId
@@ -34,7 +33,7 @@ const PaymentSuccess = () => {
     };
 
     confirmPayment();
-  }, [searchParams, backendUrl]);
+  }, [searchParams]);
 
   if (loading) {
     return (

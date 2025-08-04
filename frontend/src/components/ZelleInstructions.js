@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getApiUrl, API_ENDPOINTS } from '../config/api';
 
 const ZelleInstructions = () => {
   const { bookingId } = useParams();
@@ -10,13 +11,11 @@ const ZelleInstructions = () => {
   const [success, setSuccess] = useState(false);
   const [zelleConfig, setZelleConfig] = useState({ zelle_email: 'psicolizparra@gmail.com', amount: '$50.00' });
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-
   // Load Zelle configuration
   useEffect(() => {
     const loadZelleConfig = async () => {
       try {
-        const response = await axios.get(`${backendUrl}/api/zelle-config`);
+        const response = await axios.get(getApiUrl(API_ENDPOINTS.ZELLE_CONFIG));
         setZelleConfig(response.data);
       } catch (error) {
         console.error('Error loading Zelle config:', error);
@@ -24,7 +23,7 @@ const ZelleInstructions = () => {
       }
     };
     loadZelleConfig();
-  }, [backendUrl]);
+  }, []);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -55,7 +54,7 @@ const ZelleInstructions = () => {
       formData.append('booking_id', bookingId);
       formData.append('file', file);
 
-      await axios.post(`${backendUrl}/api/upload-zelle-proof`, formData, {
+      await axios.post(getApiUrl(API_ENDPOINTS.UPLOAD_ZELLE_PROOF), formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
