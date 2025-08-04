@@ -25,57 +25,27 @@ const AdminPanel = () => {
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [scheduleLoading, setScheduleLoading] = useState(false);
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-
   const authenticate = async () => {
     try {
       setError('');
       const auth = btoa(`${credentials.username}:${credentials.password}`);
       
-      // Try the current window origin first (for preview environment)
-      let apiUrl = `${window.location.origin}/api`;
+      // Test authentication with stats endpoint
+      const response = await axios.get(getApiUrl(API_ENDPOINTS.ADMIN.STATS), {
+        headers: { 'Authorization': `Basic ${auth}` },
+        timeout: 10000
+      });
       
-      try {
-        const response = await axios.get(`${apiUrl}/admin/stats`, {
-          headers: { 'Authorization': `Basic ${auth}` },
-          timeout: 5000
-        });
-        
-        // Store credentials for future requests
-        localStorage.setItem('adminAuth', auth);
-        setAuthenticated(true);
-        loadData();
-        return;
-      } catch (error) {
-        // If that fails, try localhost (for local development)
-        if (error.response?.status !== 401) {
-          apiUrl = 'http://localhost:8001/api';
-          try {
-            const response = await axios.get(`${apiUrl}/admin/stats`, {
-              headers: { 'Authorization': `Basic ${auth}` },
-              timeout: 5000
-            });
-            
-            localStorage.setItem('adminAuth', auth);
-            setAuthenticated(true);
-            loadData();
-            return;
-          } catch (localError) {
-            if (localError.response?.status === 401) {
-              setError('Credenciales incorrectas');
-              return;
-            }
-          }
-        }
-        
-        if (error.response?.status === 401) {
-          setError('Credenciales incorrectas');
-        } else {
-          setError('Error de conexión al servidor');
-        }
-      }
+      // Store credentials for future requests
+      localStorage.setItem('adminAuth', auth);
+      setAuthenticated(true);
+      loadData();
     } catch (error) {
-      setError('Error inesperado: ' + error.message);
+      if (error.response?.status === 401) {
+        setError('Credenciales incorrectas');
+      } else {
+        setError('Error de conexión al servidor');
+      }
       console.error('Authentication failed:', error);
     }
   };
