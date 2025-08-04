@@ -149,13 +149,13 @@ async def get_zelle_config():
     settings = await db.settings.find_one({"type": "zelle_config"})
     if settings:
         return {
-            "zelle_email": settings.get("zelle_email", os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com')),
+            "zelle_email": settings.get("zelle_email", ZELLE_EMAIL),
             "amount": f"${settings.get('consultation_price', 50.00):.2f}",
             "currency": "USD"
         }
     
     return {
-        "zelle_email": os.getenv('ZELLE_EMAIL', 'psicolizparra@gmail.com'),
+        "zelle_email": ZELLE_EMAIL,
         "amount": "$50.00",
         "currency": "USD"
     }
