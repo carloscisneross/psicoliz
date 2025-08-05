@@ -6,7 +6,7 @@ from pymongo.server_api import ServerApi
 # Test MongoDB Atlas connection
 def test_mongodb_connection():
     # Get the MongoDB URL from environment or use the one provided
-    mongo_url = os.getenv('MONGO_URL', 'mongodb+srv://psicoliz_user:liz1992@cluster0.scj5wku.mongodb.net/psicoliz?retryWrites=true&w=majority&appName=Cluster0')
+    mongo_url = os.getenv('MONGO_URL', 'mongodb+srv://psicoliz_user:Liz1992.@cluster0.scj5wku.mongodb.net/psicoliz?retryWrites=true&w=majority&appName=Cluster0')
     
     print(f"Testing MongoDB connection to: {mongo_url.replace('liz1992', '***')}")
     
