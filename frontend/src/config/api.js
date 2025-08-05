@@ -1,5 +1,5 @@
 // API Configuration for Psicoliz
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || "https://psicoliz.onrender.com";
+const API_BASE_URL = "http://localhost:8001";
 
 // Ensure API URLs are properly formatted
 export const getApiUrl = (endpoint) => {
